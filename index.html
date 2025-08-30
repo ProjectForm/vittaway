@@ -195,6 +195,31 @@
             font-size: 0.8rem;
         }
         
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .success-message {
+            display: none;
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .error-message {
+            display: none;
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            text-align: center;
+            color: var(--error);
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -220,6 +245,18 @@
         <h1>Planejador de Dieta Personalizada</h1>
         <p class="description">Responda as perguntas abaixo para receber um plano alimentar adaptado às suas necessidades</p>
         
+        <div class="success-message" id="successMessage">
+            Formulário enviado com sucesso! Em breve você receberá seu plano alimentar personalizado por e-mail.
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.
+        </div>
+        
+        <div class="loading" id="loading">
+            Enviando dados, por favor aguarde...
+        </div>
+        
         <form id="dietForm">
             <!-- Seção 1: Dados Pessoais -->
             <div class="form-section">
@@ -228,6 +265,11 @@
                 <div class="form-group">
                     <label for="nome">Nome completo <span class="required">*</span></label>
                     <input type="text" id="nome" name="nome" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">E-mail <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
                 </div>
                 
                 <div class="form-group">
@@ -270,27 +312,27 @@
                 
                 <div class="form-group">
                     <label for="cintura">Circunferência da cintura (na altura do umbigo, em cm) <span class="required">*</span></label>
-                    <input type="number" id="cintura" name="cintura" min="50" max="200" required>
+                    <input type="number" id="cintura" name="cintura" min="40" max="250" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="quadril">Circunferência do quadril (na maior parte do glúteo, em cm) <span class="required">*</span></label>
-                    <input type="number" id="quadril" name="quadril" min="60" max="200" required>
+                    <input type="number" id="quadril" name="quadril" min="50" max="250" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="busto">Circunferência do busto/peito (na altura dos mamilos, em cm)</label>
-                    <input type="number" id="busto" name="busto" min="60" max="200">
+                    <input type="number" id="busto" name="busto" min="50" max="250">
                 </div>
                 
                 <div class="form-group">
                     <label for="braco">Circunferência do braço (meio do bíceps relaxado, em cm)</label>
-                    <input type="number" id="braco" name="braco" min="15" max="80">
+                    <input type="number" id="braco" name="braco" min="10" max="100">
                 </div>
                 
                 <div class="form-group">
                     <label for="coxa">Circunferência da coxa (meio da coxa, em cm)</label>
-                    <input type="number" id="coxa" name="coxa" min="30" max="120">
+                    <input type="number" id="coxa" name="coxa" min="20" max="150">
                 </div>
                 
                 <div class="form-group">
@@ -698,7 +740,7 @@
                     <div class="checkbox-group">
                         <div class="checkbox-option">
                             <input type="checkbox" id="desafio-tempo" name="desafio" value="tempo">
-                            <label for="desafio-tempo">Falta de tempo</label>
+                            <label for="desafio-tempo">Falta de tiempo</label>
                         </div>
                         <div class="checkbox-option">
                             <input type="checkbox" id="desafio-vontade" name="desafio" value="vontade">
@@ -795,36 +837,63 @@
         exercicioSim.addEventListener('change', toggleTipoExercicio);
         exercicioNao.addEventListener('change', toggleTipoExercicio);
         
-        // Validação do formulário
+        // Validação e envio do formulário
         document.getElementById('dietForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Formulário enviado com sucesso! Em breve você receberá seu plano alimentar personalizado.');
-            <script>
-            document.getElementById('dietForm').addEventListener('submit', function(e) {
-                e.preventDefault(); // evita recarregar a página
-
-
-                const formData = new FormData(e.target);
-                const formObject = {};
-                formData.forEach((value, key) => formObject[key] = value);
-
-
-                fetch("https://script.google.com/macros/s/AKfycbz_oJBYxVYR4jRAcFKd4cfMf7CZIoX-S1OcR_PMQAaQuReBeMPbLXzJPWP1thLlLoS_/exec", {
-                method: "POST",
-                    body: JSON.stringify(formObject),
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                })
-                .then(res => res.text())
-                .then(res => {
-                    alert("✅ Formulário enviado com sucesso!");
-                    e.target.reset(); // limpa o formulário
-                })
-                .catch(err => {
-                    alert("❌ Erro ao enviar: " + err);
-                });
+            
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Coletar dados do formulário
+            const formData = new FormData(e.target);
+            const formObject = {};
+            formData.forEach((value, key) => {
+                // Para checkboxes e radios com múltiplos valores
+                if (formObject[key]) {
+                    formObject[key] = Array.isArray(formObject[key]) 
+                        ? [...formObject[key], value] 
+                        : [formObject[key], value];
+                } else {
+                    formObject[key] = value;
+                }
             });
-            </script>
-        </body>
-        </html>
+            
+            // Adicionar timestamp
+            formObject.timestamp = new Date().toISOString();
+            
+            // Enviar para o Google Apps Script
+            fetch("https://script.google.com/macros/s/AKfycbz_oJBYxVYR4jRAcFKd4cfMf7CZIoX-S1OcR_PMQAaQuReBeMPbLXzJPWP1thLlLoS_/exec", {
+                method: "POST",
+                body: JSON.stringify(formObject),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Erro na resposta do servidor');
+                }
+                return res.text();
+            })
+            .then(res => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                e.target.reset();
+                
+                // Rolagem suave para a mensagem de sucesso
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(err => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+                console.error("Erro ao enviar:", err);
+                
+                // Rolagem suave para a mensagem de erro
+                document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
