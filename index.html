@@ -199,6 +199,7 @@
             display: none;
             text-align: center;
             margin: 20px 0;
+            color: var(--primary);
         }
         
         .success-message {
@@ -208,6 +209,7 @@
             border-radius: 4px;
             margin: 20px 0;
             text-align: center;
+            color: var(--primary-dark);
         }
         
         .error-message {
@@ -218,6 +220,24 @@
             margin: 20px 0;
             text-align: center;
             color: var(--error);
+        }
+        
+        .debug-info {
+            display: none;
+            background-color: #fff3e0;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            font-size: 0.8rem;
+        }
+        
+        .retry-button {
+            background-color: var(--secondary);
+            margin-top: 10px;
+        }
+        
+        .retry-button:hover {
+            background-color: #e65100;
         }
         
         @media (max-width: 600px) {
@@ -246,15 +266,23 @@
         <p class="description">Responda as perguntas abaixo para receber um plano alimentar adaptado às suas necessidades</p>
         
         <div class="success-message" id="successMessage">
-            Formulário enviado com sucesso! Em breve você receberá seu plano alimentar personalizado por e-mail.
+            <h3>✅ Formulário enviado com sucesso!</h3>
+            <p>Em breve você receberá seu plano alimentar personalizado por e-mail.</p>
         </div>
         
         <div class="error-message" id="errorMessage">
-            Ocorreu um erro ao enviar o formulário. Por favor, tente novamente.
+            <h3>❌ Ocorreu um erro ao enviar o formulário</h3>
+            <p id="errorDetail">Por favor, tente novamente.</p>
+            <button class="retry-button" id="retryButton">Tentar Novamente</button>
         </div>
         
         <div class="loading" id="loading">
-            Enviando dados, por favor aguarde...
+            <p>Enviando dados, por favor aguarde...</p>
+        </div>
+        
+        <div class="debug-info" id="debugInfo">
+            <h4>Informações para Debug:</h4>
+            <p id="debugDetail"></p>
         </div>
         
         <form id="dietForm">
@@ -730,6 +758,7 @@
                         </div>
                         <div class="radio-option">
                             <input type="radio" id="cardapio-variado" name="cardapio" value="variado">
+                           极
                             <label for="cardapio-variado">Variado</label>
                         </div>
                     </div>
@@ -740,13 +769,14 @@
                     <div class="checkbox-group">
                         <div class="checkbox-option">
                             <input type="checkbox" id="desafio-tempo" name="desafio" value="tempo">
-                            <label for="desafio-tempo">Falta de tiempo</label>
+                            <label for="desafio-tempo">Falta de tempo</label>
                         </div>
                         <div class="checkbox-option">
                             <input type="checkbox" id="desafio-vontade" name="desafio" value="vontade">
                             <label for="desafio-vontade">Vontade de comer doces/guloseimas</label>
                         </div>
                         <div class="checkbox-option">
+                           极
                             <input type="checkbox" id="desafio-disciplina" name="desafio" value="disciplina">
                             <label for="desafio-disciplina">Falta de disciplina</label>
                         </div>
@@ -837,14 +867,18 @@
         exercicioSim.addEventListener('change', toggleTipoExercicio);
         exercicioNao.addEventListener('change', toggleTipoExercicio);
         
+        // URL do Google Apps Script
+        const scriptURL = "https://script.google.com/macros/s/AKfycbz_oJBYxVYR4jRAcFKd4cfMf7CZIoX-S1OcR_PMQAaQuReBeMPbLXzJPWP1thLlLoS_/exec";
+        
         // Validação e envio do formulário
         document.getElementById('dietForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Mostrar loading
+            // Mostrar loading e esconder outras mensagens
             document.getElementById('loading').style.display = 'block';
             document.getElementById('successMessage').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('debugInfo').style.display = 'none';
             
             // Coletar dados do formulário
             const formData = new FormData(e.target);
@@ -864,20 +898,20 @@
             formObject.timestamp = new Date().toISOString();
             
             // Enviar para o Google Apps Script
-            fetch("https://script.google.com/macros/s/AKfycbz_oJBYxVYR4jRAcFKd4cfMf7CZIoX-S1OcR_PMQAaQuReBeMPbLXzJPWP1thLlLoS_/exec", {
+            fetch(scriptURL, {
                 method: "POST",
                 body: JSON.stringify(formObject),
                 headers: {
                     "Content-Type": "application/json"
                 }
             })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Erro na resposta do servidor');
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
                 }
-                return res.text();
+                return response.text();
             })
-            .then(res => {
+            .then(data => {
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
                 e.target.reset();
@@ -885,15 +919,43 @@
                 // Rolagem suave para a mensagem de sucesso
                 document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
             })
-            .catch(err => {
+            .catch(error => {
+                console.error("Erro ao enviar:", error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('errorMessage').style.display = 'block';
-                console.error("Erro ao enviar:", err);
+                document.getElementById('errorDetail').textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                
+                // Mostrar informações de debug
+                document.getElementById('debugInfo').style.display = 'block';
+                document.getElementById('debugDetail').textContent = `URL: ${scriptURL}\nErro: ${error.message}\nTipo: ${error.name}`;
                 
                 // Rolagem suave para a mensagem de erro
                 document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
             });
         });
+        
+        // Botão de tentar novamente
+        document.getElementById('retryButton').addEventListener('click', function() {
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('debugInfo').style.display = 'none';
+        });
+        
+        // Testar a conexão com o Google Apps Script
+        function testConnection() {
+            fetch(scriptURL, {
+                method: "HEAD",
+                mode: "no-cors"
+            })
+            .then(() => {
+                console.log("Conexão com o Google Apps Script parece estar funcionando");
+            })
+            .catch(error => {
+                console.warn("Não foi possível testar a conexão com o Google Apps Script:", error);
+            });
+        }
+        
+        // Testar a conexão quando a página carregar
+        window.addEventListener('load', testConnection);
     </script>
 </body>
 </html>
