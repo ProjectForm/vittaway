@@ -356,7 +356,7 @@
                     <legend>1. Dados Pessoais</legend>
                     <div class="form-group">
                         <label for="nome">Nome Completo <span class="required-star">*</span></label>
-                        <input type="text" id="nome" name="nome" placeholder="Ex: Maria da Silva" required>
+                        <input type="text" id="nome" name="nome" required>
                         <div class="input-error-message">Por favor, insira seu nome.</div>
                     </div>
                     <div class="form-group">
@@ -366,7 +366,7 @@
                     </div>
                     <div class="form-group">
                         <label for="idade">Idade <span class="required-star">*</span></label>
-                        <input type="number" id="idade" name="idade" placeholder="Ex: 30" min="12" max="120" required>
+                        <input type="number" id="idade" name="idade" min="12" max="120" required>
                         <div class="input-error-message">Por favor, insira uma idade válida.</div>
                     </div>
                     <div class="form-group">
@@ -394,9 +394,9 @@
                     </div>
                     <div class="form-group"><label for="cintura">Cintura (cm)</label><input type="number" id="cintura" name="cintura" placeholder="Medida na altura do umbigo"></div>
                     <div class="form-group"><label for="quadril">Quadril (cm)</label><input type="number" id="quadril" name="quadril" placeholder="Medida na parte mais larga"></div>
-                    <div class="form-group"><label for="busto">Busto/Tórax (cm)</label><input type="number" id="busto" name="busto"></div>
+                    <div class="form-group"><label for="busto">Busto/Tórax (cm)</label><input type="number" id="busto" name="busto" placeholder="Medida na altura do mamilo"></div>
                     <div class="form-group"><label for="braco">Braço (cm)</label><input type="number" id="braco" name="braco" placeholder="Braço relaxado"></div>
-                    <div class="form-group"><label for="coxa">Coxa (cm)</label><input type="number" id="coxa" name="coxa" placeholder="Parte mais larga da coxa"></div>
+                    <div class="form-group"><label for="coxa">Coxa (cm)</label><input type="number" id="coxa" name="coxa" placeholder="Parte mais larga da coxa (meio)"></div>
                 </fieldset>
                 
                 <fieldset>
@@ -588,19 +588,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         
-        // =========================================================================
-        // URL DO SEU WEB APP SCRIPT DO GOOGLE
-        // =========================================================================
-        // TODO: Substitua a string abaixo pela URL de implantação do seu Google Apps Script.
-        // INSTRUÇÕES:
-        // 1. Crie um Google Apps Script.
-        // 2. Cole o código do `doPost(e)` fornecido separadamente.
-        // 3. Clique em "Implantar" > "Nova implantação".
-        // 4. Selecione: Tipo "App da Web".
-        // 5. Em "Quem pode acessar", selecione "Qualquer pessoa". IMPORTANTE!
-        // 6. Clique em "Implantar".
-        // 7. Copie a URL do app da Web (que termina em /exec) e cole aqui.
-        const APP_SCRIPT_URL = 'COLE_A_URL_DO_SEU_APP_SCRIPT_AQUI';
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxIyuqN-VelQCuEZWfc0PFNwGs0T0athbTky4SfAEw3gEwqEQ14DEkRp-t5p0UDsXj-3w/exec';
         // =========================================================================
 
         const form = document.getElementById('vittaway-form');
