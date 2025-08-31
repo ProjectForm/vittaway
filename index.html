@@ -1,623 +1,829 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>VittaWay — Planejador de Dieta</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano Alimentar Personalizado - VittaWay</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Fonte: opcional -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. Reset e Variáveis Globais --- */
+        :root {
+            --green-dark: #256A3F;
+            --green-medium: #2E7D32;
+            --green-light: #60AD5E;
+            --white: #FFFFFF;
+            --gray-soft: #f4f6f8;
+            --gray-medium: #e0e0e0;
+            --gray-dark: #333333;
+            --error-color: #d32f2f;
 
-  <style>
-    :root{
-      --green-dark: #163c2b;
-      --green: #2e7d32;
-      --green-light: #60ad5e;
-      --muted: #6b6b6b;
-      --surface: #ffffff;
-      --bg: #f4fbf6;
-      --danger: #c62828;
-      --radius: 12px;
-      --shadow: 0 6px 20px rgba(16, 94, 48, 0.08);
-      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    }
+            --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition-speed: 0.3s ease;
+        }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#f7fffb 0%, var(--bg) 100%);
-      color:#0f1720;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:32px;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .wrap{
-      max-width:1000px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 1fr 420px;
-      gap:28px;
-      align-items:start;
-    }
+        html {
+            scroll-behavior: smooth;
+        }
 
-    /* Card principal (form) */
-    .card {
-      background:var(--surface);
-      border-radius:var(--radius);
-      padding:28px;
-      box-shadow:var(--shadow);
-      border: 1px solid rgba(13,53,29,0.04);
-    }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--gray-soft);
+            color: var(--gray-dark);
+            line-height: 1.6;
+        }
 
-    header.appHeader{
-      display:flex;
-      align-items:center;
-      gap:16px;
-      margin-bottom:6px;
-    }
-    .logo {
-      width:56px;height:56px;
-      border-radius:10px;
-      background:linear-gradient(135deg,var(--green),var(--green-light));
-      display:flex;align-items:center;justify-content:center;
-      color:white;font-weight:700;font-size:18px;
-      box-shadow: 0 6px 18px rgba(46,125,50,0.12);
-    }
-    .title {
-      font-size:20px;font-weight:700;color:var(--green-dark);
-      line-height:1;
-    }
-    .subtitle {
-      font-size:13px;color:var(--muted);margin-top:6px;
-    }
+        /* --- 2. Layout Principal e Header --- */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
 
-    .help {
-      font-size:13px;color:var(--muted);margin-top:12px;padding:12px;border-radius:10px;background:#f0fff4;border:1px solid rgba(46,125,50,0.06)
-    }
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
 
-    form .row { display:flex; gap:12px; }
-    form .col { flex:1; min-width:0; }
+        .header__logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            letter-spacing: -1px;
+        }
 
-    label{
-      display:block;font-size:13px;color:var(--green-dark);margin-bottom:6px;font-weight:600;
-    }
-    input[type="text"], input[type="number"], input[type="email"], input[type="time"], select, textarea {
-      width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6efe8;background: #fbfff9;
-      font-size:14px;color:#073218;
-    }
-    textarea{min-height:86px;resize:vertical}
+        .header__logo span {
+            color: var(--green-light);
+        }
 
-    .input-inline{display:flex;gap:8px;align-items:center}
-    .radio-group, .checkbox-group { display:flex;flex-wrap:wrap;gap:10px; }
-    .radio-option, .checkbox-option { background:#fff;padding:6px 8px;border-radius:8px;border:1px solid #eef6ee; display:flex;align-items:center; gap:8px; font-size:13px; }
+        .header__subtitle {
+            font-size: 1.25rem;
+            color: var(--green-medium);
+            margin-top: 0.25rem;
+        }
 
-    .small { font-size:13px;color:var(--muted); margin-top:6px; }
-    .required { color: var(--danger); margin-left:4px; font-weight:700; }
+        .header__description {
+            max-width: 600px;
+            margin: 1rem auto 0;
+            color: #555;
+        }
+        
+        /* --- 3. Estilos do Formulário (Cartão) --- */
+        .vittaway-form {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        fieldset {
+            border: none;
+            border-top: 1px solid var(--gray-medium);
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
 
-    .actions { display:flex; gap:12px; align-items:center; justify-content:flex-end; margin-top:18px; }
-    .btn {
-      background:var(--green); color:#fff; padding:12px 16px; border-radius:10px; border:0; font-weight:700; cursor:pointer;
-      box-shadow: 0 8px 20px rgba(46,125,50,0.12);
-    }
-    .btn:hover { background:var(--green-dark) }
-    .btn[disabled]{ opacity:0.6; cursor:not-allowed }
+        legend {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            margin-bottom: 1.5rem;
+            padding: 0 0.5rem;
+            margin-left: -0.5rem;
+        }
 
-    .secondary { background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--green-dark); padding:10px 14px; border-radius:10px; }
+        /* --- 4. Grupos de Campos e Inputs --- */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
 
-    .meta { font-size:13px;color:var(--muted); margin-top:12px }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #444;
+        }
 
-    /* Right column (summary / instructions) */
-    .aside { background: linear-gradient(180deg,#fff,#f9fff7); border-radius:12px; padding:20px; box-shadow: var(--shadow) }
-    .aside h3{ margin:0 0 8px 0; color:var(--green-dark); font-size:16px }
-    .aside p{ font-size:13px; color:var(--muted); margin:0 0 12px 0 }
+        .form-group label .required-star {
+            color: var(--error-color);
+        }
 
-    /* Toast */
-    .toast {
-      position:fixed;right:20px;bottom:20px;background:var(--green);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.12);
-      transform:translateY(10px);opacity:0;transition:all .28s ease;pointer-events:none;
-    }
-    .toast.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="number"],
+        .form-group input[type="time"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-medium);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: var(--font-family);
+            transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--green-medium);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
 
-    /* Responsive */
-    @media (max-width:980px) {
-      .wrap { grid-template-columns: 1fr; padding:16px; }
-    }
-  </style>
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-error-message {
+            color: var(--error-color);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none; /* Oculto por padrão */
+        }
+        
+        .form-group.error input,
+        .form-group.error select,
+        .form-group.error textarea {
+             border-color: var(--error-color);
+        }
+        
+        .form-group.error .input-error-message {
+            display: block;
+        }
+
+        /* --- 5. Opções (Radio, Checkbox, Slider) --- */
+        .options-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .options-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        .options-group input[type="radio"],
+        .options-group input[type="checkbox"] {
+            width: 1em;
+            height: 1em;
+            accent-color: var(--green-medium);
+        }
+
+        /* Slider de Estresse */
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        #estresse-valor {
+            font-weight: bold;
+            color: var(--green-medium);
+            min-width: 20px;
+        }
+        
+        /* --- 6. Botão de Envio --- */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--green-medium);
+            color: var(--white);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), transform var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background-color: var(--green-dark);
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            background-color: var(--green-light);
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none; /* Oculto por padrão */
+        }
+
+        .submit-btn.loading .spinner {
+            display: block;
+        }
+        .submit-btn.loading .btn-text {
+            margin-left: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- 7. Modal e Toast de Sucesso --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity var(--transition-speed), visibility var(--transition-speed);
+            z-index: 1000;
+        }
+        
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            max-width: 500px;
+            transform: scale(0.9);
+            transition: transform var(--transition-speed);
+        }
+        
+        .modal-overlay.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h2 {
+            color: var(--green-dark);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--green-medium);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color var(--transition-speed);
+        }
+        .modal-close-btn:hover {
+            background: var(--green-dark);
+        }
+
+        /* --- 8. Acessibilidade e Utilitários --- */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* --- 9. Responsividade (Mobile-first) --- */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem 1rem;
+            }
+            .vittaway-form {
+                padding: 1.5rem;
+            }
+            legend {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <main class="wrap">
-    <!-- left: formulário -->
-    <section class="card" aria-labelledby="formTitle">
-      <header class="appHeader" role="banner">
-        <div class="logo" aria-hidden="true">VW</div>
-        <div>
-          <div class="title" id="formTitle">VittaWay — Planejador de Dieta</div>
-          <div class="subtitle">Preencha com dados reais. Receba um plano estimado e metas práticas.</div>
+
+    <div class="container">
+        <header class="header">
+            <h1 class="header__logo">Vitta<span>Way</span></h1>
+            <p class="header__subtitle">Seu caminho para uma vida mais saudável.</p>
+            <p class="header__description">
+                Preencha o formulário abaixo com atenção. Suas respostas são a base para criarmos um plano alimentar 100% personalizado e eficaz para você.
+            </p>
+        </header>
+
+        <main>
+            <form id="vittaway-form" class="vittaway-form" novalidate>
+                
+                <fieldset>
+                    <legend>1. Dados Pessoais</legend>
+                    <div class="form-group">
+                        <label for="nome">Nome Completo <span class="required-star">*</span></label>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: Maria da Silva" required>
+                        <div class="input-error-message">Por favor, insira seu nome.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail <span class="required-star">*</span></label>
+                        <input type="email" id="email" name="email" placeholder="seu.email@exemplo.com" required>
+                        <div class="input-error-message">Por favor, insira um e-mail válido.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="idade">Idade <span class="required-star">*</span></label>
+                        <input type="number" id="idade" name="idade" placeholder="Ex: 30" min="12" max="120" required>
+                        <div class="input-error-message">Por favor, insira uma idade válida.</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sexo <span class="required-star">*</span></label>
+                        <div class="options-group">
+                            <label><input type="radio" name="sexo" value="masculino" required> Masculino</label>
+                            <label><input type="radio" name="sexo" value="feminino"> Feminino</label>
+                            <label><input type="radio" name="sexo" value="outro"> Outro</label>
+                        </div>
+                        <div class="input-error-message">Por favor, selecione uma opção.</div>
+                    </div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>2. Medidas Corporais</legend>
+                    <div class="form-group">
+                        <label for="altura">Altura (cm) <span class="required-star">*</span></label>
+                        <input type="number" id="altura" name="altura" placeholder="Ex: 175" required>
+                        <div class="input-error-message">Insira sua altura em centímetros.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="peso">Peso (kg) <span class="required-star">*</span></label>
+                        <input type="number" id="peso" name="peso" step="0.1" placeholder="Ex: 68.5" required>
+                        <div class="input-error-message">Insira seu peso em quilogramas.</div>
+                    </div>
+                    <div class="form-group"><label for="cintura">Cintura (cm)</label><input type="number" id="cintura" name="cintura" placeholder="Medida na altura do umbigo"></div>
+                    <div class="form-group"><label for="quadril">Quadril (cm)</label><input type="number" id="quadril" name="quadril" placeholder="Medida na parte mais larga"></div>
+                    <div class="form-group"><label for="busto">Busto/Tórax (cm)</label><input type="number" id="busto" name="busto"></div>
+                    <div class="form-group"><label for="braco">Braço (cm)</label><input type="number" id="braco" name="braco" placeholder="Braço relaxado"></div>
+                    <div class="form-group"><label for="coxa">Coxa (cm)</label><input type="number" id="coxa" name="coxa" placeholder="Parte mais larga da coxa"></div>
+                </fieldset>
+                
+                <fieldset>
+                    <legend>3. Seus Objetivos</legend>
+                    <div class="form-group">
+                        <label>Qual seu principal objetivo? <span class="required-star">*</span></label>
+                        <div class="options-group">
+                            <label><input type="radio" name="objetivo" value="emagrecer" required> Emagrecer</label>
+                            <label><input type="radio" name="objetivo" value="ganhar-massa"> Ganhar Massa Muscular</label>
+                            <label><input type="radio" name="objetivo" value="manter-peso"> Manter o Peso</label>
+                            <label><input type="radio" name="objetivo" value="melhorar-saude"> Melhorar Saúde/Disposição</label>
+                        </div>
+                        <div class="input-error-message">Por favor, selecione um objetivo.</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tempoObjetivo">Em quanto tempo (meses) você gostaria de atingir seu objetivo?</label>
+                        <input type="number" id="tempoObjetivo" name="tempoObjetivo" min="1" placeholder="Ex: 3">
+                    </div>
+                    <div class="form-group">
+                        <label>Qual sua prioridade?</label>
+                        <div class="options-group">
+                            <label><input type="radio" name="prioridade" value="rapido"> Resultados rápidos</label>
+                            <label><input type="radio" name="prioridade" value="sustentavel"> Processo sustentável</label>
+                            <label><input type="radio" name="prioridade" value="equilibrio" checked> Equilíbrio entre os dois</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Você já seguiu alguma dieta antes?</label>
+                        <div class="options-group">
+                            <label><input type="radio" name="jaSeguiuDieta" value="sim"> Sim</label>
+                            <label><input type="radio" name="jaSeguiuDieta" value="nao" checked> Não</label>
+                        </div>
+                    </div>
+                    <div class="form-group hidden" id="dieta-anterior-container">
+                        <label for="dietaAnteriorExperiencia">Como foi sua experiência? (O que funcionou e o que não funcionou?)</label>
+                        <textarea id="dietaAnteriorExperiencia" name="dietaAnteriorExperiencia" placeholder="Ex: Tentei a dieta X, perdi peso rápido mas não consegui manter..."></textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>4. Saúde e Restrições</legend>
+                    <div class="form-group">
+                        <label for="alergias">Você possui alguma alergia alimentar?</label>
+                        <input type="text" id="alergias" name="alergias" placeholder="Ex: Glúten, lactose, amendoim, frutos do mar">
+                    </div>
+                    <div class="form-group">
+                        <label for="restricoes">Algum alimento que você não come por motivos não alérgicos? (Ex: veganismo, religião)</label>
+                        <input type="text" id="restricoes" name="restricoes" placeholder="Ex: Não como carne vermelha">
+                    </div>
+                    <div class="form-group">
+                        <label for="preferenciasAlimentares">Descreva suas preferências alimentares em geral.</label>
+                        <textarea id="preferenciasAlimentares" name="preferenciasAlimentares" placeholder="Ex: Gosto de comidas mais leves, prefiro frango e peixe, adoro saladas..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Você possui algum problema de saúde? (Marque todos que se aplicam)</label>
+                        <div class="options-group">
+                            <label><input type="checkbox" name="problemasSaude" value="diabetes"> Diabetes</label>
+                            <label><input type="checkbox" name="problemasSaude" value="hipertensao"> Hipertensão</label>
+                            <label><input type="checkbox" name="problemasSaude" value="colesterol"> Colesterol Alto</label>
+                            <label><input type="checkbox" name="problemasSaude" value="tireoide"> Problemas na Tireoide</label>
+                            <label><input type="checkbox" name="problemasSaude" value="gastrico"> Problemas Gástricos</label>
+                            <label><input type="checkbox" name="problemasSaude" value="outro"> Outro(s)</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="medicamentos">Você usa algum medicamento contínuo? Se sim, qual?</label>
+                        <textarea id="medicamentos" name="medicamentos" placeholder="Liste os medicamentos e, se souber, a dosagem"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Você tem ou já teve algum distúrbio alimentar?</label>
+                        <div class="options-group">
+                            <label><input type="radio" name="disturbioAlimentar" value="sim"> Sim</label>
+                            <label><input type="radio" name="disturbioAlimentar" value="nao" checked> Não</label>
+                             <label><input type="radio" name="disturbioAlimentar" value="prefiro-nao-dizer"> Prefiro não dizer</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="estresse">Em uma escala de 0 a 5, qual seu nível de estresse atualmente?</label>
+                        <div class="slider-group">
+                            <span>0</span>
+                            <input type="range" id="estresse" name="estresse" min="0" max="5" value="2" style="width: 100%;">
+                            <span>5</span>
+                            <span id="estresse-valor">2</span>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>5. Seus Hábitos</legend>
+                    <div class="form-group">
+                        <label for="refeicoes">Quantas grandes refeições você faz por dia? (Café, Almoço, Jantar)</label>
+                        <select id="refeicoes" name="refeicoes">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected>3</option>
+                            <option value="4+">4 ou mais</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Você costuma fazer lanches entre as refeições?</label>
+                        <div class="options-group">
+                            <label><input type="radio" name="lanches" value="sim" checked> Sim</label>
+                            <label><input type="radio" name="lanches" value="nao"> Não</label>
+                            <label><input type="radio" name="lanches" value="as-vezes"> Às vezes</label>
+                        </div>
+                    </div>
+                    <div class="form-group"><label for="acordar">Que horas você costuma acordar?</label><input type="time" id="acordar" name="acordar"></div>
+                    <div class="form-group"><label for="dormir">Que horas você costuma dormir?</label><input type="time" id="dormir" name="dormir"></div>
+                    <div class="form-group">
+                        <label for="gostaComer">Quais alimentos você mais gosta de comer?</label>
+                        <textarea id="gostaComer" name="gostaComer" placeholder="Liste seus alimentos favoritos."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="naoGosta">Quais alimentos você NÃO gosta de jeito nenhum?</label>
+                        <textarea id="naoGosta" name="naoGosta" placeholder="Liste os alimentos que devemos evitar no seu plano."></textarea>
+                    </div>
+                    <div class="form-group"><label>Com que frequência você come doces?</label><div class="options-group"><label><input type="radio" name="doces" value="diariamente"> Diariamente</label><label><input type="radio" name="doces" value="semanalmente" checked> Semanalmente</label><label><input type="radio" name="doces" value="raramente"> Raramente</label></div></div>
+                    <div class="form-group"><label>Com que frequência você consome bebidas alcoólicas?</label><div class="options-group"><label><input type="radio" name="alcool" value="nao-consumo" checked> Não consumo</label><label><input type="radio" name="alcool" value="socialmente"> Socialmente</label><label><input type="radio" name="alcool" value="frequentemente"> Frequentemente</label></div></div>
+                    <div class="form-group"><label>Qual sua ingestão de água diária?</label><div class="options-group"><label><input type="radio" name="agua" value="baixa"> Baixa (menos de 1L)</label><label><input type="radio" name="agua" value="media" checked> Média (1-2L)</label><label><input type="radio" name="agua" value="alta"> Alta (mais de 2L)</label></div></div>
+                    <div class="form-group"><label for="localRefeicoes">Onde você costuma fazer suas principais refeições?</label><select id="localRefeicoes" name="localRefeicoes"><option value="casa" selected>Em casa</option><option value="trabalho">No trabalho (levo marmita)</option><option value="restaurante">Restaurante/Buffet</option><option value="variado">Varia muito</option></select></div>
+                    <div class="form-group"><label for="preparoRef">Quem prepara suas refeições?</label><select id="preparoRef" name="preparoRef"><option value="eu-mesmo" selected>Eu mesmo(a)</option><option value="outra-pessoa">Outra pessoa</option><option value="delivery">Peço delivery/compro pronto</option></select></div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>6. Atividade Física</legend>
+                    <div class="form-group">
+                        <label>Você pratica exercícios físicos regularmente?</label>
+                        <div class="options-group">
+                            <label><input type="radio" name="praticaExercicio" value="sim"> Sim</label>
+                            <label><input type="radio" name="praticaExercicio" value="nao" checked> Não</label>
+                        </div>
+                    </div>
+                    <div class="form-group hidden" id="tipo-exercicio-container">
+                        <label for="tipoExercicio">Quais exercícios/atividades você pratica e com que frequência?</label>
+                        <textarea id="tipoExercicio" name="tipoExercicio" placeholder="Ex: Musculação 3x por semana, corrida 2x..."></textarea>
+                    </div>
+                    <div class="form-group"><label>Seu nível de atividade diária (fora exercícios):</label><div class="options-group"><label><input type="radio" name="nivelAtividade" value="sedentario" checked> Sedentário (maior parte sentado)</label><label><input type="radio" name="nivelAtividade" value="leve"> Leve (caminhadas leves)</label><label><input type="radio" name="nivelAtividade" value="ativo"> Ativo (trabalho em pé, etc)</label></div></div>
+                    <div class="form-group"><label for="trabalho">Como é o seu trabalho?</label><select id="trabalho" name="trabalho"><option value="escritorio" selected>Escritório/Sentado</option><option value="hibrido">Híbrido/Variado</option><option value="ativo-fisicamente">Ativo fisicamente</option><option value="nao-trabalho">Não trabalho/Estudante</option></select></div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>7. Preferências da Dieta</legend>
+                    <div class="form-group">
+                        <label>O que você mais valoriza em uma dieta?</label>
+                        <div class="options-group">
+                            <label><input type="checkbox" name="preferencias" value="tempo-preparo"> Preparo rápido</label>
+                            <label><input type="checkbox" name="preferencias" value="custo-baixo"> Custo baixo</label>
+                            <label><input type="checkbox" name="preferencias" value="variedade"> Muita variedade</label>
+                            <label><input type="checkbox" name="preferencias" value="facilidade-ingredientes"> Ingredientes fáceis de achar</label>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Que tipo de abordagem você prefere?</label><div class="options-group"><label><input type="radio" name="tipoDieta" value="adaptada" checked> Adaptada à minha rotina atual</label><label><input type="radio" name="tipoDieta" value="radical"> Uma mudança mais radical</dlabel></div></div>
+                    <div class="form-group"><label>Como você prefere o cardápio?</label><div class="options-group"><label><input type="radio" name="cardapio" value="fixo"> Fixo (mesmas refeições por alguns dias)</label><label><input type="radio" name="cardapio" value="variado" checked> Variado (uma refeição diferente a cada dia)</label></div></div>
+                    <div class="form-group">
+                        <label>Quais são seus maiores desafios na alimentação?</label>
+                        <div class="options-group">
+                            <label><input type="checkbox" name="desafios" value="organizacao"> Falta de tempo/organização</label>
+                            <label><input type="checkbox" name="desafios" value="fome-emocional"> Fome emocional/ansiedade</label>
+                            <label><input type="checkbox" name="desafios" value="eventos-sociais"> Eventos sociais</label>
+                            <label><input type="checkbox" name="desafios" value="vontade-doces"> Vontade de comer doces</label>
+                            <label><input type="checkbox" name="desafios" value="disciplina"> Falta de disciplina</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div style="margin-top: 3rem;">
+                    <button type="submit" class="submit-btn" id="submit-button">
+                        <span class="btn-text">Gerar meu Plano Personalizado</span>
+                        <div class="spinner"></div>
+                    </button>
+                </div>
+
+            </form>
+            <div id="form-status" class="sr-only" aria-live="polite"></div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-content">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 1rem;">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="#2E7D32"/>
+            </svg>
+            <h2>Formulário Enviado!</h2>
+            <p>Recebemos suas informações com sucesso. Em breve, seu plano VittaWay estará sendo preparado. Fique de olho no seu e-mail!</p>
+            <button class="modal-close-btn" id="close-modal-btn">Fechar</button>
         </div>
-      </header>
+    </div>
 
-      <div class="help" id="helpBox">
-        Preenchimento rápido — você pode usar fita métrica para as circunferências. Os resultados são estimativos e não substituem acompanhamento profissional.
-      </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        
+        // =========================================================================
+        // URL DO SEU WEB APP SCRIPT DO GOOGLE
+        // =========================================================================
+        // TODO: Substitua a string abaixo pela URL de implantação do seu Google Apps Script.
+        // INSTRUÇÕES:
+        // 1. Crie um Google Apps Script.
+        // 2. Cole o código do `doPost(e)` fornecido separadamente.
+        // 3. Clique em "Implantar" > "Nova implantação".
+        // 4. Selecione: Tipo "App da Web".
+        // 5. Em "Quem pode acessar", selecione "Qualquer pessoa". IMPORTANTE!
+        // 6. Clique em "Implantar".
+        // 7. Copie a URL do app da Web (que termina em /exec) e cole aqui.
+        const APP_SCRIPT_URL = 'COLE_A_URL_DO_SEU_APP_SCRIPT_AQUI';
+        // =========================================================================
 
-      <form id="dietForm" novalidate>
-        <!-- Dados Pessoais -->
-        <div style="margin-top:18px">
-          <label for="nome">Nome completo <span class="required">*</span></label>
-          <input id="nome" name="nome" type="text" autocomplete="name" required placeholder="Seu nome completo">
-        </div>
-
-        <div class="row" style="margin-top:12px">
-          <div class="col">
-            <label for="idade">Idade <span class="required">*</span></label>
-            <input id="idade" name="idade" type="number" min="12" max="120" required placeholder="Ex: 29">
-          </div>
-          <div class="col">
-            <label for="sexo">Sexo biológico <span class="required">*</span></label>
-            <div class="radio-group" id="sexo">
-              <label class="radio-option"><input type="radio" name="sexo" value="masculino" required> Masculino</label>
-              <label class="radio-option"><input type="radio" name="sexo" value="feminino"> Feminino</label>
-              <label class="radio-option"><input type="radio" name="sexo" value="outro"> Outro</label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Medidas -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Medidas (use fita métrica)</legend>
-
-          <div class="row">
-            <div class="col">
-              <label for="altura">Altura (cm) <span class="required">*</span></label>
-              <input id="altura" name="altura" type="number" min="100" max="250" step="0.1" required placeholder="Ex: 175">
-            </div>
-            <div class="col">
-              <label for="peso">Peso (kg) <span class="required">*</span></label>
-              <input id="peso" name="peso" type="number" min="30" max="300" step="0.1" required placeholder="Ex: 78.5">
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label for="cintura">Cintura (cm) <span class="required">*</span></label>
-              <input id="cintura" name="cintura" type="number" min="50" max="200" required>
-            </div>
-            <div class="col">
-              <label for="quadril">Quadril (cm) <span class="required">*</span></label>
-              <input id="quadril" name="quadril" type="number" min="60" max="200" required>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label for="busto">Busto/Peito (cm)</label>
-              <input id="busto" name="busto" type="number" min="60" max="200">
-            </div>
-            <div class="col">
-              <label for="braco">Braço (cm)</label>
-              <input id="braco" name="braco" type="number" min="15" max="80">
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label for="coxa">Coxa (cm)</label>
-            <input id="coxa" name="coxa" type="number" min="30" max="120">
-          </div>
-        </fieldset>
-
-        <!-- Objetivos -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Objetivo e Metas</legend>
-
-          <label>Principal objetivo <span class="required">*</span></label>
-          <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="objetivo" value="emagrecer" required> Emagrecer</label>
-            <label class="radio-option"><input type="radio" name="objetivo" value="ganhar-massa"> Ganhar massa</label>
-            <label class="radio-option"><input type="radio" name="objetivo" value="manter-peso"> Manter peso</label>
-            <label class="radio-option"><input type="radio" name="objetivo" value="melhorar-saude"> Melhorar saúde</label>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label for="tempoObjetivo">Prazo desejado (meses) <span class="required">*</span></label>
-              <input id="tempoObjetivo" name="tempoObjetivo" type="number" min="1" max="60" required>
-            </div>
-            <div class="col">
-              <label>Prioridade <span class="required">*</span></label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="prioridade" value="rapido" required> Resultados rápidos</label>
-                <label class="radio-option"><input type="radio" name="prioridade" value="sustentavel"> Sustentável</label>
-                <label class="radio-option"><input type="radio" name="prioridade" value="equilibrio"> Equilíbrio</label>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Já seguiu dieta antes?</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="jaSeguiuDieta" value="sim"> Sim</label>
-              <label class="radio-option"><input type="radio" name="jaSeguiuDieta" value="nao"> Não</label>
-            </div>
-            <div id="dietaAnteriorGroup" style="display:none;margin-top:8px">
-              <label for="dietaAnteriorExperiencia">O que funcionou / não funcionou</label>
-              <textarea id="dietaAnteriorExperiencia" name="dietaAnteriorExperiencia"></textarea>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- Saúde e restrições -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Saúde e restrições</legend>
-
-          <div class="row">
-            <div class="col">
-              <label for="alergias">Alergias / Intolerâncias</label>
-              <input id="alergias" name="alergias" type="text" placeholder="Ex: lactose, amendoim">
-            </div>
-            <div class="col">
-              <label for="restricoes">Restrições religiosas / estilo</label>
-              <input id="restricoes" name="restricoes" type="text" placeholder="Ex: vegano">
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label for="preferenciasAlimentares">Preferências (proteína/carbo)</label>
-            <textarea id="preferenciasAlimentares" name="preferenciasAlimentares" placeholder="Ex: frango, peixe, arroz"></textarea>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Problemas de saúde (marque os que se aplicam)</label>
-            <div class="checkbox-group">
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="diabetes"> Diabetes</label>
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="hipertensao"> Hipertensão</label>
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="colesterol"> Colesterol</label>
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="tireoide"> Tireoide</label>
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="gastrico"> Gastro</label>
-              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="outro"> Outro</label>
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label for="medicamentos">Medicamentos (nome e dosagem)</label>
-            <textarea id="medicamentos" name="medicamentos" placeholder="Liste se fizer uso"></textarea>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Nível de estresse (0 a 5) <span class="required">*</span></label>
-            <input id="estresse" name="estresse" type="range" min="0" max="5" step="1" value="2">
-            <div class="small">0 (nenhum) — 5 (muito)</div>
-          </div>
-        </fieldset>
-
-        <!-- Hábitos alimentares -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Hábitos alimentares</legend>
-
-          <div class="row">
-            <div class="col">
-              <label for="refeicoes">Refeições principais/dia <span class="required">*</span></label>
-              <select id="refeicoes" name="refeicoes" required>
-                <option value="">Selecione</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4+">4 ou mais</option>
-              </select>
-            </div>
-            <div class="col">
-              <label>Faz lanches?</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="lanches" value="nunca"> Nunca</label>
-                <label class="radio-option"><input type="radio" name="lanches" value="as-vezes"> Às vezes</label>
-                <label class="radio-option"><input type="radio" name="lanches" value="sempre"> Sempre</label>
-              </div>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label for="acordar">Horário que acorda</label>
-              <input id="acordar" name="acordar" type="time">
-            </div>
-            <div class="col">
-              <label for="dormir">Horário que dorme</label>
-              <input id="dormir" name="dormir" type="time">
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label for="gostaComer">O que mais gosta de comer <span class="required">*</span></label>
-            <textarea id="gostaComer" name="gostaComer" required placeholder="Ex: massas, carnes, saladas..."></textarea>
-          </div>
-
-          <div style="margin-top:8px">
-            <label for="naoGosta">O que não gosta</label>
-            <textarea id="naoGosta" name="naoGosta" placeholder="Ex: brócolis, peixe..."></textarea>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label>Doces / frituras / refrigerantes?</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="doces" value="nunca"> Nunca</label>
-                <label class="radio-option"><input type="radio" name="doces" value="pouco"> Pouco</label>
-                <label class="radio-option"><input type="radio" name="doces" value="frequentemente"> Frequentemente</label>
-              </div>
-            </div>
-            <div class="col">
-              <label>Consumo de álcool</label>
-              <div class="radio-group">
-                <label class="radio-option"><input type="radio" name="alcool" value="nunca"> Nunca</label>
-                <label class="radio-option"><input type="radio" name="alcool" value="socialmente"> Socialmente</label>
-                <label class="radio-option"><input type="radio" name="alcool" value="frequentemente"> Frequentemente</label>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Costuma beber água?</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="agua" value="sim"> Sim</label>
-              <label class="radio-option"><input type="radio" name="agua" value="nao"> Não</label>
-            </div>
-          </div>
-
-          <div class="row" style="margin-top:8px">
-            <div class="col">
-              <label for="localRefeicoes">Onde faz a maioria das refeições?</label>
-              <select id="localRefeicoes" name="localRefeicoes">
-                <option value="">Selecione</option>
-                <option value="casa">Em casa</option>
-                <option value="trabalho">No trabalho</option>
-                <option value="restaurante">Restaurante</option>
-                <option value="variados">Variados</option>
-              </select>
-            </div>
-            <div class="col">
-              <label for="preparoRef">Quem prepara suas refeições?</label>
-              <select id="preparoRef" name="preparoRef">
-                <option value="">Selecione</option>
-                <option value="eu">Eu mesmo(a)</option>
-                <option value="familia">Família</option>
-                <option value="cozinheira">Cozinheira</option>
-                <option value="restaurante">Restaurante</option>
-              </select>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- Atividade física -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Atividade física</legend>
-
-          <label>Pratica atividade física?</label>
-          <div class="radio-group">
-            <label class="radio-option"><input type="radio" name="exercicio" value="sim"> Sim</label>
-            <label class="radio-option"><input type="radio" name="exercicio" value="nao"> Não</label>
-          </div>
-
-          <div id="tipoExercicioGroup" style="display:none;margin-top:8px">
-            <label for="tipoExercicio">Se sim, qual e com que frequência?</label>
-            <textarea id="tipoExercicio" name="tipoExercicio"></textarea>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Nível de atividade diária</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="atividade" value="sedentario"> Sedentário</label>
-              <label class="radio-option"><input type="radio" name="atividade" value="leve"> Leve</label>
-              <label class="radio-option"><input type="radio" name="atividade" value="moderado"> Moderado</label>
-              <label class="radio-option"><input type="radio" name="atividade" value="intenso"> Intenso</label>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- Preferências -->
-        <fieldset style="margin-top:14px;border:0;padding:0">
-          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Preferências da dieta</legend>
-
-          <div class="checkbox-group">
-            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="tempo"> Pouco tempo de preparo</label>
-            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="barato"> Ingredientes baratos</label>
-            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="variado"> Refeições variadas</label>
-            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="facil"> Fácil fora de casa</label>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Tipo de dieta preferida</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="tipoDieta" value="adaptada"> Adaptada</label>
-              <label class="radio-option"><input type="radio" name="tipoDieta" value="radical"> Radical</label>
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Cardápio</label>
-            <div class="radio-group">
-              <label class="radio-option"><input type="radio" name="cardapio" value="fixo"> Fixo</label>
-              <label class="radio-option"><input type="radio" name="cardapio" value="variado"> Variado</label>
-            </div>
-          </div>
-
-          <div style="margin-top:8px">
-            <label>Maior desafio</label>
-            <div class="checkbox-group">
-              <label class="checkbox-option"><input type="checkbox" name="desafios" value="tempo"> Falta de tempo</label>
-              <label class="checkbox-option"><input type="checkbox" name="desafios" value="vontade"> Vontade por doces</label>
-              <label class="checkbox-option"><input type="checkbox" name="desafios" value="disciplina"> Falta de disciplina</label>
-              <label class="checkbox-option"><input type="checkbox" name="desafios" value="conhecimento"> Falta de conhecimento</label>
-              <label class="checkbox-option"><input type="checkbox" name="desafios" value="financeiro"> Limitação financeira</label>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- Email e envio -->
-        <div style="margin-top:14px">
-          <label for="email">E-mail para receber o relatório <span class="required">*</span></label>
-          <input id="email" name="email" type="email" required placeholder="seu@exemplo.com">
-          <div class="meta">Lembre-se: só enviamos relatório para e-mails autorizados (controle no backend).</div>
-        </div>
-
-        <div class="actions" style="margin-top:18px">
-          <button type="button" class="secondary" id="resetBtn">Limpar</button>
-          <button type="submit" class="btn" id="submitBtn">Enviar e gerar plano</button>
-        </div>
-
-        <div class="meta" style="margin-top:12px">
-          Ao enviar você concorda com a política de privacidade (dados usados apenas para gerar o plano). Não substitui consulta profissional.
-        </div>
-      </form>
-    </section>
-
-    <!-- right: instruções / resumo -->
-    <aside class="aside">
-      <h3>Pronto para testar</h3>
-      <p>Insira os dados e clique em <strong>Enviar e gerar plano</strong>. O sistema envia os dados para um Apps Script (substitua o link no código).</p>
-      <h3 style="margin-top:14px">Observações técnicas</h3>
-      <ul style="font-size:13px;color:var(--muted);padding-left:18px;">
-        <li>Substitua <code>APP_SCRIPT_URL</code> pelo seu link /exec do Apps Script.</li>
-        <li>Se houver erro CORS no navegador, verifique deploy do Apps Script: "Executar como: Você" / "Quem tem acesso: Qualquer pessoa (anônima)".</li>
-        <li>Para teste rápido use <code>curl</code> ou Postman: envie JSON com as mesmas chaves (camelCase).</li>
-      </ul>
-    </aside>
-  </main>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script>
-    // === CONFIG: cole seu URL do Apps Script aqui (use /exec, não /dev) ===
-    const APP_SCRIPT_URL = 'COLE_AQUI_SEU_APP_SCRIPT_URL_EXEC';
-    // ====================================================================
-
-    // Helpers
-    const $ = (sel, ctx=document) => ctx.querySelector(sel);
-    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-    const toast = (msg, ok=true) => {
-      const el = $('#toast');
-      el.textContent = msg;
-      el.style.background = ok ? 'var(--green)' : 'var(--danger)';
-      el.classList.add('show');
-      setTimeout(()=>el.classList.remove('show'), 3800);
-    };
-
-    const form = $('#dietForm');
-    const submitBtn = $('#submitBtn');
-    const resetBtn = $('#resetBtn');
-
-    // Conditional UI
-    $$('input[name="jaSeguiuDieta"]').forEach(r => {
-      r.addEventListener('change', ()=> {
-        $('#dietaAnteriorGroup').style.display = r.value === 'sim' && r.checked ? 'block' : 'none';
-      });
-    });
-    $$('input[name="exercicio"]').forEach(r => {
-      r.addEventListener('change', ()=> {
-        $('#tipoExercicioGroup').style.display = r.value === 'sim' && r.checked ? 'block' : 'none';
-      });
-    });
-
-    // Serialize form to object (handles checkboxes -> arrays)
-    function serializeFormToObject(formEl){
-      const fd = new FormData(formEl);
-      const obj = {};
-      for (const [key, value] of fd.entries()) {
-        // If key already exists, convert to array
-        if (obj.hasOwnProperty(key)) {
-          if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
-          obj[key].push(value);
-        } else {
-          obj[key] = value;
-        }
-      }
-      // normalize empty strings to undefined (optional)
-      return obj;
-    }
-
-    // Front-end validation helper (basic)
-    function validate(formEl) {
-      // use native validity + required attributes
-      if (!formEl.reportValidity()) return false;
-      // custom: ensure at least one objetivo selected
-      const objetivo = formEl.querySelector('input[name="objetivo"]:checked');
-      if (!objetivo) { toast('Selecione um objetivo.', false); return false; }
-      return true;
-    }
-
-    // Submit handler
-    form.addEventListener('submit', async (ev) => {
-      ev.preventDefault();
-      if (!validate(form)) return;
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Enviando...';
-
-      const payload = serializeFormToObject(form);
-      payload.timestamp = new Date().toISOString();
-
-      // Try normal fetch first
-      try {
-        const res = await fetch(APP_SCRIPT_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+        const form = document.getElementById('vittaway-form');
+        const submitButton = document.getElementById('submit-button');
+        const btnText = submitButton.querySelector('.btn-text');
+        const spinner = submitButton.querySelector('.spinner');
+        const formStatus = document.getElementById('form-status');
+        const successModal = document.getElementById('success-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        
+        // --- Lógica para campos condicionais ---
+        const jaSeguiuDietaRadios = document.querySelectorAll('input[name="jaSeguiuDieta"]');
+        const dietaAnteriorContainer = document.getElementById('dieta-anterior-container');
+        
+        jaSeguiuDietaRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                dietaAnteriorContainer.classList.toggle('hidden', e.target.value !== 'sim');
+            });
         });
 
-        // If response is opaque or not ok, try fallback
-        if (!res.ok) {
-          // If status exists but not ok => error
-          let text = await res.text().catch(()=>null);
-          toast('Erro no envio: ' + (text || res.status), false);
-          console.error('Server error response:', res, text);
-        } else {
-          // try parse JSON (Apps Script returns JSON)
-          const json = await res.json().catch(()=>null);
-          if (json && json.status === 'success') {
-            toast('Formulário enviado com sucesso!');
-            form.reset();
-          } else {
-            toast('Enviado — verifique planilha. (resposta inesperada)', true);
-            form.reset();
-          }
+        const praticaExercicioRadios = document.querySelectorAll('input[name="praticaExercicio"]');
+        const tipoExercicioContainer = document.getElementById('tipo-exercicio-container');
+
+        praticaExercicioRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                tipoExercicioContainer.classList.toggle('hidden', e.target.value !== 'sim');
+            });
+        });
+        
+        // --- Atualização do valor do slider ---
+        const estresseSlider = document.getElementById('estresse');
+        const estresseValor = document.getElementById('estresse-valor');
+        estresseSlider.addEventListener('input', (e) => {
+            estresseValor.textContent = e.target.value;
+        });
+
+        // --- Funções de validação ---
+        function showError(input, message) {
+            const formGroup = input.closest('.form-group');
+            const errorDiv = formGroup.querySelector('.input-error-message');
+            formGroup.classList.add('error');
+            if (errorDiv) {
+              errorDiv.textContent = message;
+              errorDiv.style.display = 'block';
+            }
         }
-      } catch (err) {
-        // CORS or network error: tentar fallback com no-cors
-        console.warn('Fetch normal falhou:', err);
-        try {
-          await fetch(APP_SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          // Não é possível ler resposta em no-cors; presumimos sucesso se não lançou
-          toast('Enviado (fallback). Se não aparecer na planilha, verifique deploy do Apps Script.', true);
-          form.reset();
-        } catch (err2) {
-          console.error('Fallback também falhou:', err2);
-          toast('Falha ao enviar — veja console e verifique URL/permissões.', false);
+        
+        function clearError(input) {
+            const formGroup = input.closest('.form-group');
+             if (formGroup) {
+               formGroup.classList.remove('error');
+               const errorDiv = formGroup.querySelector('.input-error-message');
+               if(errorDiv) errorDiv.style.display = 'none';
+            }
         }
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Enviar e gerar plano';
-      }
+        
+        function validateForm() {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+
+            // Limpa todos os erros antigos
+            form.querySelectorAll('.form-group.error').forEach(group => {
+                group.classList.remove('error');
+                const errorDiv = group.querySelector('.input-error-message');
+                if (errorDiv) errorDiv.style.display = 'none';
+            });
+            
+            requiredFields.forEach(field => {
+                let fieldValid = true;
+                if (field.type === 'radio') {
+                    const radioGroup = document.querySelectorAll(`input[name="${field.name}"]`);
+                    if (![...radioGroup].some(r => r.checked)) {
+                        fieldValid = false;
+                        showError(field, 'Por favor, selecione uma opção.');
+                    }
+                } else if (field.type === 'checkbox') {
+                     const checkGroup = document.querySelectorAll(`input[name="${field.name}"]:checked`);
+                     if(checkGroup.length === 0){
+                        // Apenas um exemplo, não há checkboxes obrigatórios neste form
+                     }
+                } else {
+                     if (!field.value.trim()) {
+                         fieldValid = false;
+                         showError(field, field.dataset.errorMessage || `O campo ${field.labels[0].textContent.replace('*','').trim()} é obrigatório.`);
+                     } else if(field.type === 'email' && !/^\S+@\S+\.\S+$/.test(field.value)) {
+                         fieldValid = false;
+                         showError(field, 'Por favor, insira um e-mail válido.');
+                     }
+                }
+
+                if(!fieldValid) isValid = false;
+            });
+            
+            if(!isValid) {
+                 const firstErrorField = form.querySelector('.form-group.error');
+                 if(firstErrorField) firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            return isValid;
+        }
+
+        // Adiciona listeners para validar em tempo real após a primeira tentativa de envio
+        form.querySelectorAll('input[required], select[required], textarea[required]').forEach(input => {
+            input.addEventListener('input', () => clearError(input));
+            input.addEventListener('change', () => clearError(input));
+        });
+
+        // --- Lógica de submissão do formulário ---
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            if (!validateForm()) {
+                formStatus.textContent = 'Existem erros no formulário. Por favor, corrija-os.';
+                return;
+            }
+
+            setLoadingState(true);
+
+            // Coleta dos dados do formulário
+            const formData = new FormData(form);
+            const payload = {};
+            
+            // Converte FormData para um objeto JSON, tratando checkboxes
+            formData.forEach((value, key) => {
+                if (!Reflect.has(payload, key)) {
+                    payload[key] = value;
+                    return;
+                }
+                if (!Array.isArray(payload[key])) {
+                    payload[key] = [payload[key]];
+                }
+                payload[key].push(value);
+            });
+            
+            // Converte arrays (de checkboxes) em strings separadas por vírgula
+            for (const key in payload) {
+                if (Array.isArray(payload[key])) {
+                    payload[key] = payload[key].join(', ');
+                }
+            }
+            
+            try {
+                // Primeira tentativa: Envio normal com CORS
+                console.log("Tentando envio para o Apps Script (modo CORS)...");
+                const response = await fetch(APP_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Sucesso (CORS):', result);
+                    handleSuccess();
+                } else {
+                    // Se o servidor respondeu com um erro (ex: 4xx, 5xx)
+                    throw new Error(`Erro do servidor: ${response.statusText}`);
+                }
+
+            } catch (error) {
+                console.error("Erro na primeira tentativa (CORS):", error);
+                
+                // Fallback para 'no-cors' se o erro for de rede (típico de bloqueio CORS no navegador)
+                if (error instanceof TypeError) {
+                     console.log("Falha de CORS detectada. Tentando envio com modo 'no-cors'...");
+                     try {
+                         await fetch(APP_SCRIPT_URL, {
+                             method: 'POST',
+                             mode: 'no-cors', // Importante: não podemos ler a resposta aqui
+                             headers: { 'Content-Type': 'application/json' },
+                             body: JSON.stringify(payload)
+                         });
+                         console.log("Envio 'no-cors' concluído. Assumindo sucesso.");
+                         handleSuccess();
+                     } catch (noCorsError) {
+                         console.error("Erro fatal mesmo com 'no-cors':", noCorsError);
+                         handleError("Não foi possível enviar suas informações. Verifique sua conexão e tente novamente.");
+                     }
+                } else {
+                    // Outros tipos de erro
+                    handleError(`Ocorreu um erro: ${error.message}`);
+                }
+            } finally {
+                setLoadingState(false);
+            }
+        });
+
+        function setLoadingState(isLoading) {
+            submitButton.disabled = isLoading;
+            if (isLoading) {
+                submitButton.classList.add('loading');
+                btnText.textContent = 'Enviando...';
+                formStatus.textContent = 'Enviando formulário...';
+            } else {
+                submitButton.classList.remove('loading');
+                btnText.textContent = 'Gerar meu Plano Personalizado';
+            }
+        }
+
+        function handleSuccess() {
+            form.reset();
+            // Reseta manualmente os campos condicionais e o slider para o estado inicial
+            dietaAnteriorContainer.classList.add('hidden');
+            tipoExercicioContainer.classList.add('hidden');
+            estresseValor.textContent = '2';
+
+            formStatus.textContent = 'Formulário enviado com sucesso!';
+            successModal.classList.add('visible');
+        }
+
+        function handleError(message) {
+            formStatus.textContent = `Erro: ${message}`;
+            alert(message); // Um alerta simples para erro
+        }
+
+        // Fechar o modal
+        closeModalBtn.addEventListener('click', () => successModal.classList.remove('visible'));
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.remove('visible');
+            }
+        });
     });
-
-    resetBtn.addEventListener('click', ()=> {
-      form.reset();
-      toast('Formulário limpo.', true);
-    });
-
-    // Accessibility: focus first input on load
-    window.addEventListener('load', ()=>{ $('#nome').focus(); });
-
-    // Small: update slider label (if you want to display numeric)
-    const estresse = $('#estresse');
-    if(estresse){
-      estresse.addEventListener('input', ()=> {
-        // optional: show current value somewhere
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
