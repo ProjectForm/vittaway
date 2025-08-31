@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento - VittaWay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos re-utilizados do formulário principal para consistência */
+        :root {
+            --green-dark: #256A3F; --green-medium: #2E7D32; --green-light: #60AD5E;
+            --white: #FFFFFF; --gray-soft: #f4f6f8; --gray-medium: #e0e0e0; --gray-dark: #333333;
+            --font-family: 'Inter', system-ui, sans-serif; --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); --transition-speed: 0.3s ease;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-family); background-color: var(--gray-soft); color: var(--gray-dark); line-height: 1.6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 1rem; }
+        .container { width: 100%; max-width: 500px; }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header__logo { font-size: 2.5rem; font-weight: 700; color: var(--green-dark); }
+        .header__logo span { color: var(--green-light); }
+        .payment-card { background: var(--white); padding: 2.5rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow); text-align: center; }
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 0.5rem; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid var(--gray-medium); border-radius: var(--border-radius); font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: var(--green-medium); box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2); }
+        .payment-options { display: grid; grid-template-columns: 1fr; gap: 1rem; margin: 2rem 0; }
+        .option-btn { padding: 1rem; border: 2px solid var(--green-medium); border-radius: var(--border-radius); cursor: pointer; transition: all var(--transition-speed); background: #fff; }
+        .option-btn:hover { background: #e8f5e9; }
+        .option-btn.selected { border-color: var(--green-dark); background: #dcedc8; }
+        .option-btn h3 { color: var(--green-dark); margin: 0 0 0.25rem 0; }
+        .option-btn p { margin: 0; font-weight: 700; font-size: 1.25rem; }
+        .option-btn span { font-size: 0.8rem; color: #555; }
+        .payment-instructions { margin-top: 1.5rem; padding: 1.5rem; background: var(--gray-soft); border-radius: var(--border-radius); text-align: left; display: none; }
+        #pix-instructions code { display: block; background: #e0e0e0; padding: 0.75rem; border-radius: 4px; margin: 0.5rem 0; word-wrap: break-word; user-select: all; cursor: pointer; }
+        #pix-instructions img { max-width: 150px; margin: 1rem auto; display: block; }
+        #card-instructions a { display: inline-block; padding: 0.75rem 1.5rem; background: var(--green-medium); color: white; text-decoration: none; border-radius: 4px; margin-top: 1rem; font-weight: bold; }
+        .confirm-btn { width: 100%; padding: 1rem; background-color: var(--green-medium); color: var(--white); border: none; border-radius: var(--border-radius); font-size: 1.125rem; font-weight: 700; cursor: pointer; transition: all var(--transition-speed); }
+        .confirm-btn:disabled { background-color: var(--gray-medium); cursor: not-allowed; }
+        .confirm-btn:not(:disabled):hover { background-color: var(--green-dark); }
+        .feedback-message { margin-top: 1rem; font-weight: 500; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header__logo">Vitta<span>Way</span></h1>
+        </header>
+        <main>
+            <div class="payment-card">
+                <h2>Complete seu Pagamento</h2>
+                <p>Insira seus dados para garantir o recebimento da sua análise personalizada.</p>
+                <form id="payment-form" style="margin-top: 2rem;">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo</label>
+                        <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" placeholder="Onde você receberá a análise" required>
+                    </div>
+                </form>
+
+                <div class="payment-options">
+                    <button class="option-btn" id="pix-btn">
+                        <h3>Pagar com PIX</h3>
+                        <p>R$ 27,90</p>
+                    </button>
+                    <button class="option-btn" id="card-btn">
+                        <h3>Pagar com Cartão</h3>
+                        <p>R$ 30,90</p>
+                        <span>(taxas da operadora inclusas)</span>
+                    </button>
+                </div>
+
+                <div class="payment-instructions" id="pix-instructions">
+                    <h4>Pagamento via PIX</h4>
+                    <p>1. Abra o app do seu banco e escolha a opção PIX.</p>
+                    <p>2. Escaneie o QR Code abaixo ou use a chave "Copia e Cola":</p>
+                    <img src="https://imgur.com/a/GxNclCu" alt="Exemplo de QR Code PIX"> <code id="pix-key" title="Clique para copiar">https://nubank.com.br/cobrar/achyk/68b3c559-b979-4ed7-858b-5f0d4dfc57e0</code> <p id="copy-feedback" class="feedback-message hidden" style="color: var(--green-dark);"></p>
+                </div>
+                <div class="payment-instructions" id="card-instructions">
+                    <h4>Pagamento via Cartão de Crédito</h4>
+                    <p>Você será redirecionado para um ambiente de pagamento seguro.</p>
+                    <a href="https://link.infinitepay.io/aquacarpas/Ri0x-36Xq1UXlOL-30,90" target="_blank"> Pagar com Cartão Agora
+                    </a>
+                </div>
+                
+                <button id="confirm-payment-btn" class="confirm-btn" disabled>
+                    Já paguei, registrar meu e-mail!
+                </button>
+                <p id="final-feedback" class="feedback-message"></p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // =========================================================================
+    // TODO: Insira suas URLs aqui
+    const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx7anenYu_c1ezXeYKpNdFrqvwTmmmysEn42UOMf15LHshn_IY8gp7jls19l7oMfTQVhg/exec'; 
+    const FORMULARIO_PRINCIPAL_URL = 'https://projectform.github.io/vittaway/'; // Ex: https://seu-usuario.github.io/vittaway/index.html
+    // =========================================================================
+
+    const confirmBtn = document.getElementById('confirm-payment-btn');
+    const finalFeedback = document.getElementById('final-feedback');
+    const nomeInput = document.getElementById('nome');
+    const emailInput = document.getElementById('email');
+    const paymentCard = document.querySelector('.payment-card');
+
+    // ... (o resto do seu script de seleção de pagamento e cópia da chave PIX continua igual) ...
+    const pixBtn = document.getElementById('pix-btn');
+    const cardBtn = document.getElementById('card-btn');
+    const pixInstructions = document.getElementById('pix-instructions');
+    const cardInstructions = document.getElementById('card-instructions');
+    const pixKeyElement = document.getElementById('pix-key');
+    const copyFeedback = document.getElementById('copy-feedback');
+
+    function selectOption(selected) {
+        pixBtn.classList.remove('selected');
+        cardBtn.classList.remove('selected');
+        pixInstructions.style.display = 'none';
+        cardInstructions.style.display = 'none';
+
+        if (selected === 'pix') {
+            pixBtn.classList.add('selected');
+            pixInstructions.style.display = 'block';
+        } else if (selected === 'card') {
+            cardBtn.classList.add('selected');
+            cardInstructions.style.display = 'block';
+        }
+        confirmBtn.disabled = false;
+    }
+
+    pixBtn.addEventListener('click', () => selectOption('pix'));
+    cardBtn.addEventListener('click', () => selectOption('card'));
+
+    pixKeyElement.addEventListener('click', () => {
+        navigator.clipboard.writeText(pixKeyElement.innerText).then(() => {
+            copyFeedback.innerText = 'Chave copiada com sucesso!';
+            copyFeedback.classList.remove('hidden');
+            setTimeout(() => copyFeedback.classList.add('hidden'), 2000);
+        });
+    });
+    // --- Fim da parte inalterada ---
+
+    confirmBtn.addEventListener('click', async () => {
+        const nome = nomeInput.value.trim();
+        const email = emailInput.value.trim();
+
+        if (!nome || !email || !/^\S+@\S+\.\S+$/.test(email)) {
+            finalFeedback.innerText = 'Por favor, preencha seu nome e um e-mail válido.';
+            finalFeedback.style.color = 'red';
+            return;
+        }
+
+        confirmBtn.disabled = true;
+        confirmBtn.innerText = 'Registrando...';
+
+        const payload = { action: 'addPaidEmail', nome: nome, email: email };
+
+        try {
+            await fetch(APP_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+            
+            // **A MUDANÇA ESTÁ AQUI**
+            // Em vez de só mostrar uma mensagem, vamos mudar o conteúdo do card.
+            paymentCard.innerHTML = `
+                <h2 style="color: var(--green-dark);">Tudo Certo!</h2>
+                <p>Seu acesso ao formulário VittaWay foi liberado. Clique no botão abaixo para começar a criar seu plano personalizado.</p>
+                <br>
+                <a href="${FORMULARIO_PRINCIPAL_URL}" style="display: inline-block; width: 100%; text-align: center; padding: 1rem; background-color: var(--green-medium); color: var(--white); text-decoration: none; border-radius: var(--border-radius); font-size: 1.125rem; font-weight: 700;">
+                    Acessar o Formulário
+                </a>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Dica: Salve este link, pois ele é seu acesso único.</p>
+            `;
+            
+        } catch (error) {
+            finalFeedback.style.color = 'red';
+            finalFeedback.innerText = 'Ocorreu um erro. Tente novamente ou entre em contato.';
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = 'Já paguei, registrar meu e-mail!';
+        }
+    });
+});
+</script>
+</body>
+</html>
