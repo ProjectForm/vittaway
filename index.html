@@ -1,961 +1,623 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.2">
-    <title>VittaWay - Planejador de Dieta</title>
-    <style>
-        :root {
-            --primary: #2e7d32;
-            --primary-light: #60ad5e;
-            --primary-dark: #005005;
-            --secondary: #ff8f00;
-            --text: #212121;
-            --text-light: #757575;
-            --background: #f5f5f5;
-            --surface: #ffffff;
-            --error: #c62828;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: var(--background);
-            color: var(--text);
-            line-height: 1.6;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: var(--surface);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            gap: 15px;
-        }
-        
-        .logo {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary);
-        }
-        
-        h1 {
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .description {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--text-light);
-        }
-        
-        .form-section {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .form-section-title {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
-        }
-        
-        .radio-group, .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 5px;
-        }
-        
-        .radio-option, .checkbox-option {
-            display: flex;
-            align-items: center;
-        }
-        
-        .radio-option input, .checkbox-option input {
-            width: auto;
-            margin-right: 8px;
-        }
-        
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            display: block;
-            margin: 30px auto 0;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .calculated-value {
-            background-color: #e8f5e9;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        
-        .required {
-            color: var(--error);
-        }
-        
-        .info-box {
-            background-color: #e3f2fd;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-        }
-        
-        .privacy-notice {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-        
-        .slider-container {
-            margin: 15px 0;
-        }
-        
-        .slider {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 10px;
-            border-radius: 5px;
-            background: #d3d3d3;
-            outline: none;
-        }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary);
-            cursor: pointer;
-        }
-        
-        .slider-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 0.8rem;
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--primary);
-        }
-        
-        .success-message {
-            display: none;
-            background-color: #e8f5e9;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            text-align: center;
-            color: var(--primary-dark);
-        }
-        
-        .error-message {
-            display: none;
-            background-color: #ffebee;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            text-align: center;
-            color: var(--error);
-        }
-        
-        .debug-info {
-            display: none;
-            background-color: #fff3e0;
-            padding: 15px;
-            border-radius: 4px;
-            margin: 20px 0;
-            font-size: 0.8rem;
-        }
-        
-        .retry-button {
-            background-color: var(--secondary);
-            margin-top: 10px;
-        }
-        
-        .retry-button:hover {
-            background-color: #e65100;
-        }
-        
-        @media (max-width: 600px) {
-            .container {
-                padding: 15px;
-            }
-            
-            .radio-group, .checkbox-group {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VittaWay — Planejador de Dieta</title>
+
+  <!-- Fonte: opcional -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --green-dark: #163c2b;
+      --green: #2e7d32;
+      --green-light: #60ad5e;
+      --muted: #6b6b6b;
+      --surface: #ffffff;
+      --bg: #f4fbf6;
+      --danger: #c62828;
+      --radius: 12px;
+      --shadow: 0 6px 20px rgba(16, 94, 48, 0.08);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#f7fffb 0%, var(--bg) 100%);
+      color:#0f1720;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+    }
+
+    .wrap{
+      max-width:1000px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:start;
+    }
+
+    /* Card principal (form) */
+    .card {
+      background:var(--surface);
+      border-radius:var(--radius);
+      padding:28px;
+      box-shadow:var(--shadow);
+      border: 1px solid rgba(13,53,29,0.04);
+    }
+
+    header.appHeader{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      margin-bottom:6px;
+    }
+    .logo {
+      width:56px;height:56px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--green),var(--green-light));
+      display:flex;align-items:center;justify-content:center;
+      color:white;font-weight:700;font-size:18px;
+      box-shadow: 0 6px 18px rgba(46,125,50,0.12);
+    }
+    .title {
+      font-size:20px;font-weight:700;color:var(--green-dark);
+      line-height:1;
+    }
+    .subtitle {
+      font-size:13px;color:var(--muted);margin-top:6px;
+    }
+
+    .help {
+      font-size:13px;color:var(--muted);margin-top:12px;padding:12px;border-radius:10px;background:#f0fff4;border:1px solid rgba(46,125,50,0.06)
+    }
+
+    form .row { display:flex; gap:12px; }
+    form .col { flex:1; min-width:0; }
+
+    label{
+      display:block;font-size:13px;color:var(--green-dark);margin-bottom:6px;font-weight:600;
+    }
+    input[type="text"], input[type="number"], input[type="email"], input[type="time"], select, textarea {
+      width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6efe8;background: #fbfff9;
+      font-size:14px;color:#073218;
+    }
+    textarea{min-height:86px;resize:vertical}
+
+    .input-inline{display:flex;gap:8px;align-items:center}
+    .radio-group, .checkbox-group { display:flex;flex-wrap:wrap;gap:10px; }
+    .radio-option, .checkbox-option { background:#fff;padding:6px 8px;border-radius:8px;border:1px solid #eef6ee; display:flex;align-items:center; gap:8px; font-size:13px; }
+
+    .small { font-size:13px;color:var(--muted); margin-top:6px; }
+    .required { color: var(--danger); margin-left:4px; font-weight:700; }
+
+    .actions { display:flex; gap:12px; align-items:center; justify-content:flex-end; margin-top:18px; }
+    .btn {
+      background:var(--green); color:#fff; padding:12px 16px; border-radius:10px; border:0; font-weight:700; cursor:pointer;
+      box-shadow: 0 8px 20px rgba(46,125,50,0.12);
+    }
+    .btn:hover { background:var(--green-dark) }
+    .btn[disabled]{ opacity:0.6; cursor:not-allowed }
+
+    .secondary { background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--green-dark); padding:10px 14px; border-radius:10px; }
+
+    .meta { font-size:13px;color:var(--muted); margin-top:12px }
+
+    /* Right column (summary / instructions) */
+    .aside { background: linear-gradient(180deg,#fff,#f9fff7); border-radius:12px; padding:20px; box-shadow: var(--shadow) }
+    .aside h3{ margin:0 0 8px 0; color:var(--green-dark); font-size:16px }
+    .aside p{ font-size:13px; color:var(--muted); margin:0 0 12px 0 }
+
+    /* Toast */
+    .toast {
+      position:fixed;right:20px;bottom:20px;background:var(--green);color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      transform:translateY(10px);opacity:0;transition:all .28s ease;pointer-events:none;
+    }
+    .toast.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+
+    /* Responsive */
+    @media (max-width:980px) {
+      .wrap { grid-template-columns: 1fr; padding:16px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">VittaWay</div>
+  <main class="wrap">
+    <!-- left: formulário -->
+    <section class="card" aria-labelledby="formTitle">
+      <header class="appHeader" role="banner">
+        <div class="logo" aria-hidden="true">VW</div>
+        <div>
+          <div class="title" id="formTitle">VittaWay — Planejador de Dieta</div>
+          <div class="subtitle">Preencha com dados reais. Receba um plano estimado e metas práticas.</div>
         </div>
-        <h1>Planejador de Dieta</h1>
-        <p class="description">Responda as perguntas abaixo para receber um plano alimentar adaptado às suas necessidades</p>
-        
-        <div class="success-message" id="successMessage">
-            <h3>✅ Formulário enviado com sucesso!</h3>
-            <p>Em breve você receberá seu plano alimentar personalizado por e-mail.</p>
-        </div>
-        
-        <div class="error-message" id="errorMessage">
-            <h3>❌ Ocorreu um erro ao enviar o formulário</h3>
-            <p id="errorDetail">Por favor, tente novamente.</p>
-            <button class="retry-button" id="retryButton">Tentar Novamente</button>
-        </div>
-        
-        <div class="loading" id="loading">
-            <p>Enviando dados, por favor aguarde...</p>
-        </div>
-        
-        <div class="debug-info" id="debugInfo">
-            <h4>Informações para Debug:</h4>
-            <p id="debugDetail"></p>
-        </div>
-        
-        <form id="dietForm">
-            <!-- Seção 1: Dados Pessoais -->
-            <div class="form-section">
-                <h2 class="form-section-title">Dados Pessoais</h2>
-                
-                <div class="form-group">
-                    <label for="nome">Nome completo <span class="required">*</span></label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">E-mail <span class="required">*</span></label>
-                    <input type="email" id="email" name="email" required placeholder="exemplo@email.com">
-                </div>
-                
-                <div class="form-group">
-                    <label for="idade">Idade (anos) <span class="required">*</span></label>
-                    <input type="number" id="idade" name="idade" min="12" max="100" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Sexo biológico <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="sexo-m" name="sexo" value="masculino" required>
-                            <label for="sexo-m">Masculino</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="sexo-f" name="sexo" value="feminino">
-                            <label for="sexo-f">Feminino</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="sexo-o" name="sexo" value="outro">
-                            <label for="sexo-o">Outro</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Seção 2: Medidas Corporais -->
-            <div class="form-section">
-                <h2 class="form-section-title">Medidas Corporais</h2>
-                
-                <div class="form-group">
-                    <label for="altura">Altura (cm) <span class="required">*</span></label>
-                    <input type="number" id="altura" name="altura" min="100" max="250" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="peso">Peso atual (kg) <span class="required">*</span></label>
-                    <input type="number" id="peso" name="peso" min="30" max="300" step="0.1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="cintura">Circunferência da cintura (na altura do umbigo, em cm) <span class="required">*</span></label>
-                    <input type="number" id="cintura" name="cintura" min="40" max="250" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="quadril">Circunferência do quadril (na maior parte do glúteo, em cm) <span class="required">*</span></label>
-                    <input type="number" id="quadril" name="quadril" min="40" max="250" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="busto">Circunferência do busto/peito (na altura dos mamilos, em cm)</label>
-                    <input type="number" id="busto" name="busto" min="40" max="250">
-                </div>
-                
-                <div class="form-group">
-                    <label for="braco">Circunferência do braço (meio do bíceps relaxado, em cm)</label>
-                    <input type="number" id="braco" name="braco" min="15" max="100">
-                </div>
-                
-                <div class="form-group">
-                    <label for="coxa">Circunferência da coxa (meio da coxa, em cm)</label>
-                    <input type="number" id="coxa" name="coxa" min="20" max="150">
-                </div>
-                
-                <div class="form-group">
-                    <div id="imc-result" class="calculated-value" style="display: none;">
-                        Seu IMC: <span id="imc-value"></span> - Classificação: <span id="imc-classificacao"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Seção 3: Objetivos e Metas -->
-            <div class="form-section">
-                <h2 class="form-section-title">Objetivos e Metas</h2>
-                
-                <div class="form-group">
-                    <label>Qual seu principal objetivo? <span class="required">*</span></label>
-                    <div class="info-box">
-                        Lembre-se que mudanças saudáveis são de 0,5-1kg por semana
-                    </div>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="objetivo-emagrecer" name="objetivo" value="emagrecer" required>
-                            <label for="objetivo-emagrecer">Emagrecer</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="objetivo-massa" name="objetivo" value="ganhar-massa">
-                            <label for="objetivo-massa">Ganhar massa muscular</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="objetivo-manter" name="objetivo" value="manter-peso">
-                            <label for="objetivo-manter">Manter peso</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="objetivo-saude" name="objetivo" value="melhorar-saude">
-                            <label for="objetivo-saude">Melhorar saúde e disposição</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="tempo-objetivo">Em quanto tempo gostaria de alcançar seu objetivo (meses)? <span class="required">*</span></label>
-                    <input type="number" id="tempo-objetivo" name="tempo-objetivo" min="1" max="60" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Qual sua prioridade? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="prioridade-rapido" name="prioridade" value="rapido" required>
-                            <label for="prioridade-rapido">Resultados rápidos</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="prioridade-sustentavel" name="prioridade" value="sustentavel">
-                            <label for="prioridade-sustentavel">Resultados sustentáveis</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="prioridade-equilibrio" name="prioridade" value="equilibrio">
-                            <label for="prioridade-equilibrio">Equilíbrio</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Já seguiu alguma dieta antes? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="dieta-antiga-sim" name="dieta-antiga" value="sim" required>
-                            <label for="dieta-antiga-sim">Sim</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="dieta-antiga-nao" name="dieta-antiga" value="nao">
-                            <label for="dieta-antiga-nao">Não</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="dieta-anterior-group" style="display: none;">
-                    <label>O que funcionou e o que não funcionou em dietas anteriores?</label>
-                    <textarea id="dieta-anterior-experiencia" name="dieta-anterior-experiencia" rows="3"></textarea>
-                </div>
-            </div>
-            
-            <!-- Seção 4: Restrições e Saúde -->
-            <div class="form-section">
-                <h2 class="form-section-title">Restrições e Saúde</h2>
-                
-                <div class="form-group">
-                    <label for="alergias">Possui alguma alergia ou intolerância alimentar? Se sim, qual?</label>
-                    <input type="text" id="alergias" name="alergias" placeholder="Ex: frutos do mar, amendoim, lactose, glúten...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="restricoes">Possui alguma restrição por religião/estilo de vida?</label>
-                    <input type="text" id="restricoes" name="restricoes" placeholder="Ex: vegetariano, vegano, kosher, halal...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="preferencias-alimentares">Tem preferência por alguma fonte de proteína ou carboidratos específica?</label>
-                    <textarea id="preferencias-alimentares" name="preferencias-alimentares" rows="3" placeholder="Ex: Frango, Carne Vermelha, Peixe... ou Arroz, Massas, Batata..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Já teve problemas de saúde relacionados à alimentação?</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-diabetes" name="problemas-saude" value="diabetes">
-                            <label for="problema-diabetes">Diabetes</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-hipertensao" name="problemas-saude" value="hipertensao">
-                            <label for="problema-hipertensao">Hipertensão</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-colesterol" name="problemas-saude" value="colesterol">
-                            <label for="problema-colesterol">Colesterol alto</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-tireoide" name="problemas-saude" value="tireoide">
-                            <label for="problema-tireoide">Problemas de tireoide</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-gastrico" name="problemas-saude" value="gastrico">
-                            <label for="problema-gastrico">Problemas gastrointestinais</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="problema-outro" name="problemas-saude" value="outro">
-                            <label for="problema-outro">Outro</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="medicamentos">Faz uso de medicamentos? Se sim, quais?</label>
-                    <textarea id="medicamentos" name="medicamentos" rows="3" placeholder="Liste os medicamentos e dosagens"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Histórico de distúrbios alimentares?</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="disturbio-sim" name="disturbio" value="sim">
-                            <label for="disturbio-sim">Sim</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="disturbio-nao" name="disturbio" value="nao">
-                            <label for="disturbio-nao">Não</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="disturbio-prefiro-nao-dizer" name="disturbio" value="prefiro-nao-dizer">
-                            <label for="disturbio-prefiro-nao-dizer">Prefiro não dizer</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="estresse">Nível de estresse diário (0 a 5) <span class="required">*</span></label>
-                    <div class="slider-container">
-                        <input type="range" id="estresse" name="estresse" min="0" max="5" step="1" value="2" class="slider" required>
-                        <div class="slider-labels">
-                            <span>0 (Nenhum)</span>
-                            <span>5 (Muito)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Seção 5: Hábitos Alimentares Atuais -->
-            <div class="form-section">
-                <h2 class="form-section-title">Hábitos Alimentares Atuais</h2>
-                
-                <div class="form-group">
-                    <label for="refeicoes">Quantas refeições principais faz por dia? <span class="required">*</span></label>
-                    <select id="refeicoes" name="refeicoes" required>
-                        <option value="">Selecione</option>
-                        <option value="1">1 refeição</option>
-                        <option value="2">2 refeições</option>
-                        <option value="3">3 refeições</option>
-                        <option value="4">4 ou mais refeições</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Costuma fazer lanches entre as refeições? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="lanches-nunca" name="lanches" value="nunca" required>
-                            <label for="lanches-nunca">Nunca</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="lanches-as-vezes" name="lanches" value="as-vezes">
-                            <label for="lanches-as-vezes">Às vezes</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="lanches-sempre" name="lanches" value="sempre">
-                            <label for="lanches-sempre">Sempre</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="acordar">Qual horário você costuma acordar? <span class="required">*</span></label>
-                    <input type="time" id="acordar" name="acordar" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="dormir">Qual horário você costuma dormir? <span class="required">*</span></label>
-                    <input type="time" id="dormir" name="dormir" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="gosta-comer">O que você mais gosta de comer no dia a dia? <span class="required">*</span></label>
-                    <textarea id="gosta-comer" name="gosta-comer" rows="3" required placeholder="Ex: massas, carnes, saladas..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="nao-gosta">Quais alimentos você não gosta de jeito nenhum? <span class="required">*</span></label>
-                    <textarea id="nao-gosta" name="nao-gosta" rows="3" required placeholder="Ex: brócolis, peixe, azeitona..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Consume doces, frituras e refrigerantes? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="doces-nunca" name="doces" value="nunca" required>
-                            <label for="doces-nunca">Nunca</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="doces-pouco" name="doces" value="pouco">
-                            <label for="doces-pouco">Pouco</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="doces-frequentemente" name="doces" value="frequentemente">
-                            <label for="doces-frequentemente">Frequentemente</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Consome bebidas alcoólicas? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="alcool-nunca" name="alcool" value="nunca" required>
-                            <label for="alcool-nunca">Nunca</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="alcool-socialmente" name="alcool" value="socialmente">
-                            <label for="alcool-socialmente">Socialmente</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="alcool-frequentemente" name="alcool" value="frequentemente">
-                            <label for="alcool-frequentemente">Frequentemente</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Costuma beber bastante água? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="agua-sim" name="agua" value="sim" required>
-                            <label for="agua-sim">Sim</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="agua-nao" name="agua" value="nao">
-                            <label for="agua-nao">Não</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="local-refeicoes">Onde faz a maioria das suas refeições?</label>
-                    <select id="local-refeicoes" name="local-refeicoes">
-                        <option value="">Selecione</option>
-                        <option value="casa">Em casa</option>
-                        <option value="trabalho">No trabalho</option>
-                        <option value="restaurante">Em restaurantes</option>
-                        <option value="variados">Variados</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="preparo-refeicoes">Quem geralmente prepara suas refeições?</label>
-                    <select id="preparo-refeicoes" name="preparo-refeicoes">
-                        <option value="">Selecione</option>
-                        <option value="eu">Eu mesmo(a)</option>
-                        <option value="familia">Alguém da família</option>
-                        <option value="cozinheira">Cozinheira/empregada</option>
-                        <option value="restaurante">Restaurante/entrega</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Seção 6: Atividade Física -->
-            <div class="form-section">
-                <h2 class="form-section-title">Atividade Física</h2>
-                
-                <div class="form-group">
-                    <label>Pratica alguma atividade física? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="exercicio-sim" name="exercicio" value="sim" required>
-                            <label for="exercicio-sim">Sim</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="exercicio-nao" name="exercicio" value="nao">
-                            <label for="exercicio-nao">Não</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group" id="tipo-exercicio-group" style="display: none;">
-                    <label for="tipo-exercicio">Se sim, qual atividade e com que frequência?</label>
-                    <textarea id="tipo-exercicio" name="tipo-exercicio" rows="3" placeholder="Ex: Musculação 3x por semana, Corrida 2x por semana..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Qual seu nível de atividade diária (sem contar exercícios)? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="atividade-sedentario" name="atividade" value="sedentario" required>
-                            <label for="atividade-sedentario">Sedentário (pouco ou nenhum exercício)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="atividade-leve" name="atividade" value="leve">
-                            <label for="atividade-leve">Leve (caminhadas leves/trabalho doméstico)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="atividade-moderado" name="atividade" value="moderado">
-                            <label for="atividade-moderado">Moderado (trabalho em pé/atividade moderada)</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="atividade-intenso" name="atividade" value="intenso">
-                            <label for="atividade-intenso">Intenso (trabalho físico intenso)</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="trabalho">Tipo de trabalho/ocupação principal:</label>
-                    <select id="trabalho" name="trabalho">
-                        <option value="">Selecione</option>
-                        <option value="sedentario">Sedentário (escritório)</option>
-                        <option value="em-pe">Fico em pé a maior parte do tempo</option>
-                        <option value="ativo">Ativo (muito movimento)</option>
-                        <option value="fisico">Trabalho físico intenso</option>
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Seção 7: Preferências da Dieta -->
-            <div class="form-section">
-                <h2 class="form-section-title">Preferências da Dieta</h2>
-                
-                <div class="form-group">
-                    <label>O que seria ideal para você em uma dieta? <span class="required">*</span></label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="preferencia-tempo" name="preferencia-dieta" value="tempo">
-                            <label for="preferencia-tempo">Pouco tempo de preparo</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="preferencia-barato" name="preferencia-dieta" value="barato">
-                            <label for="preferencia-barato">Ingredientes baratos</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="preferencia-variado" name="preferencia-dieta" value="variado">
-                            <label for="preferencia-variado">Refeições variadas</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="preferencia-facil" name="preferencia-dieta" value="facil">
-                            <label for="preferencia-facil">Fácil fora de casa</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Prefere que a dieta seja próxima ao que já come ou totalmente nova? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="dieta-adaptada" name="tipo-dieta" value="adaptada" required>
-                            <label for="dieta-adaptada">Adaptada ao que já como</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="dieta-radical" name="tipo-dieta" value="radical">
-                            <label for="dieta-radical">Radicalmente diferente</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Prefere cardápio fixo ou sugestões variadas? <span class="required">*</span></label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="cardapio-fixo" name="cardapio" value="fixo" required>
-                            <label for="cardapio-fixo">Fixo</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="cardapio-variado" name="cardapio" value="variado">
-                            <label for="cardapio-variado">Variado</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Qual seu maior desafio para seguir uma alimentação saudável?</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="desafio-tempo" name="desafio" value="tempo">
-                            <label for="desafio-tempo">Falta de tempo</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="desafio-vontade" name="desafio" value="vontade">
-                            <label for="desafio-vontade">Vontade de comer doces/guloseimas</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="desafio-disciplina" name="desafio" value="disciplina">
-                            <label for="desafio-disciplina">Falta de disciplina</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="desafio-conhecimento" name="desafio" value="conhecimento">
-                            <label for="desafio-conhecimento">Falta de conhecimento</label>
-                        </div>
-                        <div class="checkbox-option">
-                            <input type="checkbox" id="desafio-financeiro" name="desafio" value="financeiro">
-                            <label for="desafio-financeiro">Limitações financeiras</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Aviso de Privacidade -->
-            <div class="privacy-notice">
-                <h3>Privacidade e Proteção de Dados</h3>
-                <p>Seus dados são coletados e processados de acordo com a LGPD (Lei Geral de Proteção de Dados - Lei nº 13.709/2018) e regulamentações similares. As informações fornecidas serão utilizadas exclusivamente para a criação do seu plano alimentar personalizado e não serão compartilhadas com terceiros sem sua autorização explícita.</p>
-                <p>Você tem o direito de acessar, corrigir ou excluir seus dados a qualquer momento entrando em contato conosco.</p>
-            </div>
-            
-            <button type="submit">Enviar Formulário</button>
-        </form>
-    </div>
+      </header>
 
-    <script>
-        // Cálculo automático do IMC
-        const alturaInput = document.getElementById('altura');
-        const pesoInput = document.getElementById('peso');
-        const imcResult = document.getElementById('imc-result');
-        const imcValue = document.getElementById('imc-value');
-        const imcClassificacao = document.getElementById('imc-classificacao');
-        
-        function calcularIMC() {
-            const altura = parseFloat(alturaInput.value) / 100; // converter cm para m
-            const peso = parseFloat(pesoInput.value);
-            
-            if (altura && peso) {
-                const imc = peso / (altura * altura);
-                imcValue.textContent = imc.toFixed(1);
-                
-                // Classificação do IMC
-                if (imc < 18.5) {
-                    imcClassificacao.textContent = 'Abaixo do peso';
-                } else if (imc < 25) {
-                    imcClassificacao.textContent = 'Peso normal';
-                } else if (imc < 30) {
-                    imcClassificacao.textContent = 'Sobrepeso';
-                } else if (imc < 35) {
-                    imcClassificacao.textContent = 'Obesidade grau I';
-                } else if (imc < 40) {
-                    imcClassificacao.textContent = 'Obesidade grau II';
-                } else {
-                    imcClassificacao.textContent = 'Obesidade grau III';
-                }
-                
-                imcResult.style.display = 'block';
-            } else {
-                imcResult.style.display = 'none';
-            }
+      <div class="help" id="helpBox">
+        Preenchimento rápido — você pode usar fita métrica para as circunferências. Os resultados são estimativos e não substituem acompanhamento profissional.
+      </div>
+
+      <form id="dietForm" novalidate>
+        <!-- Dados Pessoais -->
+        <div style="margin-top:18px">
+          <label for="nome">Nome completo <span class="required">*</span></label>
+          <input id="nome" name="nome" type="text" autocomplete="name" required placeholder="Seu nome completo">
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <div class="col">
+            <label for="idade">Idade <span class="required">*</span></label>
+            <input id="idade" name="idade" type="number" min="12" max="120" required placeholder="Ex: 29">
+          </div>
+          <div class="col">
+            <label for="sexo">Sexo biológico <span class="required">*</span></label>
+            <div class="radio-group" id="sexo">
+              <label class="radio-option"><input type="radio" name="sexo" value="masculino" required> Masculino</label>
+              <label class="radio-option"><input type="radio" name="sexo" value="feminino"> Feminino</label>
+              <label class="radio-option"><input type="radio" name="sexo" value="outro"> Outro</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medidas -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Medidas (use fita métrica)</legend>
+
+          <div class="row">
+            <div class="col">
+              <label for="altura">Altura (cm) <span class="required">*</span></label>
+              <input id="altura" name="altura" type="number" min="100" max="250" step="0.1" required placeholder="Ex: 175">
+            </div>
+            <div class="col">
+              <label for="peso">Peso (kg) <span class="required">*</span></label>
+              <input id="peso" name="peso" type="number" min="30" max="300" step="0.1" required placeholder="Ex: 78.5">
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label for="cintura">Cintura (cm) <span class="required">*</span></label>
+              <input id="cintura" name="cintura" type="number" min="50" max="200" required>
+            </div>
+            <div class="col">
+              <label for="quadril">Quadril (cm) <span class="required">*</span></label>
+              <input id="quadril" name="quadril" type="number" min="60" max="200" required>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label for="busto">Busto/Peito (cm)</label>
+              <input id="busto" name="busto" type="number" min="60" max="200">
+            </div>
+            <div class="col">
+              <label for="braco">Braço (cm)</label>
+              <input id="braco" name="braco" type="number" min="15" max="80">
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="coxa">Coxa (cm)</label>
+            <input id="coxa" name="coxa" type="number" min="30" max="120">
+          </div>
+        </fieldset>
+
+        <!-- Objetivos -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Objetivo e Metas</legend>
+
+          <label>Principal objetivo <span class="required">*</span></label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="objetivo" value="emagrecer" required> Emagrecer</label>
+            <label class="radio-option"><input type="radio" name="objetivo" value="ganhar-massa"> Ganhar massa</label>
+            <label class="radio-option"><input type="radio" name="objetivo" value="manter-peso"> Manter peso</label>
+            <label class="radio-option"><input type="radio" name="objetivo" value="melhorar-saude"> Melhorar saúde</label>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label for="tempoObjetivo">Prazo desejado (meses) <span class="required">*</span></label>
+              <input id="tempoObjetivo" name="tempoObjetivo" type="number" min="1" max="60" required>
+            </div>
+            <div class="col">
+              <label>Prioridade <span class="required">*</span></label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="prioridade" value="rapido" required> Resultados rápidos</label>
+                <label class="radio-option"><input type="radio" name="prioridade" value="sustentavel"> Sustentável</label>
+                <label class="radio-option"><input type="radio" name="prioridade" value="equilibrio"> Equilíbrio</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Já seguiu dieta antes?</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="jaSeguiuDieta" value="sim"> Sim</label>
+              <label class="radio-option"><input type="radio" name="jaSeguiuDieta" value="nao"> Não</label>
+            </div>
+            <div id="dietaAnteriorGroup" style="display:none;margin-top:8px">
+              <label for="dietaAnteriorExperiencia">O que funcionou / não funcionou</label>
+              <textarea id="dietaAnteriorExperiencia" name="dietaAnteriorExperiencia"></textarea>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Saúde e restrições -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Saúde e restrições</legend>
+
+          <div class="row">
+            <div class="col">
+              <label for="alergias">Alergias / Intolerâncias</label>
+              <input id="alergias" name="alergias" type="text" placeholder="Ex: lactose, amendoim">
+            </div>
+            <div class="col">
+              <label for="restricoes">Restrições religiosas / estilo</label>
+              <input id="restricoes" name="restricoes" type="text" placeholder="Ex: vegano">
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="preferenciasAlimentares">Preferências (proteína/carbo)</label>
+            <textarea id="preferenciasAlimentares" name="preferenciasAlimentares" placeholder="Ex: frango, peixe, arroz"></textarea>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Problemas de saúde (marque os que se aplicam)</label>
+            <div class="checkbox-group">
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="diabetes"> Diabetes</label>
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="hipertensao"> Hipertensão</label>
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="colesterol"> Colesterol</label>
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="tireoide"> Tireoide</label>
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="gastrico"> Gastro</label>
+              <label class="checkbox-option"><input type="checkbox" name="problemasSaude" value="outro"> Outro</label>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="medicamentos">Medicamentos (nome e dosagem)</label>
+            <textarea id="medicamentos" name="medicamentos" placeholder="Liste se fizer uso"></textarea>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Nível de estresse (0 a 5) <span class="required">*</span></label>
+            <input id="estresse" name="estresse" type="range" min="0" max="5" step="1" value="2">
+            <div class="small">0 (nenhum) — 5 (muito)</div>
+          </div>
+        </fieldset>
+
+        <!-- Hábitos alimentares -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Hábitos alimentares</legend>
+
+          <div class="row">
+            <div class="col">
+              <label for="refeicoes">Refeições principais/dia <span class="required">*</span></label>
+              <select id="refeicoes" name="refeicoes" required>
+                <option value="">Selecione</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4+">4 ou mais</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Faz lanches?</label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="lanches" value="nunca"> Nunca</label>
+                <label class="radio-option"><input type="radio" name="lanches" value="as-vezes"> Às vezes</label>
+                <label class="radio-option"><input type="radio" name="lanches" value="sempre"> Sempre</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label for="acordar">Horário que acorda</label>
+              <input id="acordar" name="acordar" type="time">
+            </div>
+            <div class="col">
+              <label for="dormir">Horário que dorme</label>
+              <input id="dormir" name="dormir" type="time">
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="gostaComer">O que mais gosta de comer <span class="required">*</span></label>
+            <textarea id="gostaComer" name="gostaComer" required placeholder="Ex: massas, carnes, saladas..."></textarea>
+          </div>
+
+          <div style="margin-top:8px">
+            <label for="naoGosta">O que não gosta</label>
+            <textarea id="naoGosta" name="naoGosta" placeholder="Ex: brócolis, peixe..."></textarea>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label>Doces / frituras / refrigerantes?</label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="doces" value="nunca"> Nunca</label>
+                <label class="radio-option"><input type="radio" name="doces" value="pouco"> Pouco</label>
+                <label class="radio-option"><input type="radio" name="doces" value="frequentemente"> Frequentemente</label>
+              </div>
+            </div>
+            <div class="col">
+              <label>Consumo de álcool</label>
+              <div class="radio-group">
+                <label class="radio-option"><input type="radio" name="alcool" value="nunca"> Nunca</label>
+                <label class="radio-option"><input type="radio" name="alcool" value="socialmente"> Socialmente</label>
+                <label class="radio-option"><input type="radio" name="alcool" value="frequentemente"> Frequentemente</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Costuma beber água?</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="agua" value="sim"> Sim</label>
+              <label class="radio-option"><input type="radio" name="agua" value="nao"> Não</label>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:8px">
+            <div class="col">
+              <label for="localRefeicoes">Onde faz a maioria das refeições?</label>
+              <select id="localRefeicoes" name="localRefeicoes">
+                <option value="">Selecione</option>
+                <option value="casa">Em casa</option>
+                <option value="trabalho">No trabalho</option>
+                <option value="restaurante">Restaurante</option>
+                <option value="variados">Variados</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="preparoRef">Quem prepara suas refeições?</label>
+              <select id="preparoRef" name="preparoRef">
+                <option value="">Selecione</option>
+                <option value="eu">Eu mesmo(a)</option>
+                <option value="familia">Família</option>
+                <option value="cozinheira">Cozinheira</option>
+                <option value="restaurante">Restaurante</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Atividade física -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Atividade física</legend>
+
+          <label>Pratica atividade física?</label>
+          <div class="radio-group">
+            <label class="radio-option"><input type="radio" name="exercicio" value="sim"> Sim</label>
+            <label class="radio-option"><input type="radio" name="exercicio" value="nao"> Não</label>
+          </div>
+
+          <div id="tipoExercicioGroup" style="display:none;margin-top:8px">
+            <label for="tipoExercicio">Se sim, qual e com que frequência?</label>
+            <textarea id="tipoExercicio" name="tipoExercicio"></textarea>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Nível de atividade diária</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="atividade" value="sedentario"> Sedentário</label>
+              <label class="radio-option"><input type="radio" name="atividade" value="leve"> Leve</label>
+              <label class="radio-option"><input type="radio" name="atividade" value="moderado"> Moderado</label>
+              <label class="radio-option"><input type="radio" name="atividade" value="intenso"> Intenso</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Preferências -->
+        <fieldset style="margin-top:14px;border:0;padding:0">
+          <legend class="small" style="font-weight:700;margin-bottom:8px;color:var(--green-dark)">Preferências da dieta</legend>
+
+          <div class="checkbox-group">
+            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="tempo"> Pouco tempo de preparo</label>
+            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="barato"> Ingredientes baratos</label>
+            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="variado"> Refeições variadas</label>
+            <label class="checkbox-option"><input type="checkbox" name="preferencias" value="facil"> Fácil fora de casa</label>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Tipo de dieta preferida</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="tipoDieta" value="adaptada"> Adaptada</label>
+              <label class="radio-option"><input type="radio" name="tipoDieta" value="radical"> Radical</label>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Cardápio</label>
+            <div class="radio-group">
+              <label class="radio-option"><input type="radio" name="cardapio" value="fixo"> Fixo</label>
+              <label class="radio-option"><input type="radio" name="cardapio" value="variado"> Variado</label>
+            </div>
+          </div>
+
+          <div style="margin-top:8px">
+            <label>Maior desafio</label>
+            <div class="checkbox-group">
+              <label class="checkbox-option"><input type="checkbox" name="desafios" value="tempo"> Falta de tempo</label>
+              <label class="checkbox-option"><input type="checkbox" name="desafios" value="vontade"> Vontade por doces</label>
+              <label class="checkbox-option"><input type="checkbox" name="desafios" value="disciplina"> Falta de disciplina</label>
+              <label class="checkbox-option"><input type="checkbox" name="desafios" value="conhecimento"> Falta de conhecimento</label>
+              <label class="checkbox-option"><input type="checkbox" name="desafios" value="financeiro"> Limitação financeira</label>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- Email e envio -->
+        <div style="margin-top:14px">
+          <label for="email">E-mail para receber o relatório <span class="required">*</span></label>
+          <input id="email" name="email" type="email" required placeholder="seu@exemplo.com">
+          <div class="meta">Lembre-se: só enviamos relatório para e-mails autorizados (controle no backend).</div>
+        </div>
+
+        <div class="actions" style="margin-top:18px">
+          <button type="button" class="secondary" id="resetBtn">Limpar</button>
+          <button type="submit" class="btn" id="submitBtn">Enviar e gerar plano</button>
+        </div>
+
+        <div class="meta" style="margin-top:12px">
+          Ao enviar você concorda com a política de privacidade (dados usados apenas para gerar o plano). Não substitui consulta profissional.
+        </div>
+      </form>
+    </section>
+
+    <!-- right: instruções / resumo -->
+    <aside class="aside">
+      <h3>Pronto para testar</h3>
+      <p>Insira os dados e clique em <strong>Enviar e gerar plano</strong>. O sistema envia os dados para um Apps Script (substitua o link no código).</p>
+      <h3 style="margin-top:14px">Observações técnicas</h3>
+      <ul style="font-size:13px;color:var(--muted);padding-left:18px;">
+        <li>Substitua <code>APP_SCRIPT_URL</code> pelo seu link /exec do Apps Script.</li>
+        <li>Se houver erro CORS no navegador, verifique deploy do Apps Script: "Executar como: Você" / "Quem tem acesso: Qualquer pessoa (anônima)".</li>
+        <li>Para teste rápido use <code>curl</code> ou Postman: envie JSON com as mesmas chaves (camelCase).</li>
+      </ul>
+    </aside>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // === CONFIG: cole seu URL do Apps Script aqui (use /exec, não /dev) ===
+    const APP_SCRIPT_URL = 'COLE_AQUI_SEU_APP_SCRIPT_URL_EXEC';
+    // ====================================================================
+
+    // Helpers
+    const $ = (sel, ctx=document) => ctx.querySelector(sel);
+    const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+    const toast = (msg, ok=true) => {
+      const el = $('#toast');
+      el.textContent = msg;
+      el.style.background = ok ? 'var(--green)' : 'var(--danger)';
+      el.classList.add('show');
+      setTimeout(()=>el.classList.remove('show'), 3800);
+    };
+
+    const form = $('#dietForm');
+    const submitBtn = $('#submitBtn');
+    const resetBtn = $('#resetBtn');
+
+    // Conditional UI
+    $$('input[name="jaSeguiuDieta"]').forEach(r => {
+      r.addEventListener('change', ()=> {
+        $('#dietaAnteriorGroup').style.display = r.value === 'sim' && r.checked ? 'block' : 'none';
+      });
+    });
+    $$('input[name="exercicio"]').forEach(r => {
+      r.addEventListener('change', ()=> {
+        $('#tipoExercicioGroup').style.display = r.value === 'sim' && r.checked ? 'block' : 'none';
+      });
+    });
+
+    // Serialize form to object (handles checkboxes -> arrays)
+    function serializeFormToObject(formEl){
+      const fd = new FormData(formEl);
+      const obj = {};
+      for (const [key, value] of fd.entries()) {
+        // If key already exists, convert to array
+        if (obj.hasOwnProperty(key)) {
+          if (!Array.isArray(obj[key])) obj[key] = [obj[key]];
+          obj[key].push(value);
+        } else {
+          obj[key] = value;
         }
-        
-        alturaInput.addEventListener('input', calcularIMC);
-        pesoInput.addEventListener('input', calcularIMC);
-        
-        // Mostrar/ocultar campo de experiência em dietas anteriores
-        const dietaAntigaSim = document.getElementById('dieta-antiga-sim');
-        const dietaAntigaNao = document.getElementById('dieta-antiga-nao');
-        const dietaAnteriorGroup = document.getElementById('dieta-anterior-group');
-        
-        function toggleExperienciaDietaAnterior() {
-            dietaAnteriorGroup.style.display = dietaAntigaSim.checked ? 'block' : 'none';
-        }
-        
-        dietaAntigaSim.addEventListener('change', toggleExperienciaDietaAnterior);
-        dietaAntigaNao.addEventListener('change', toggleExperienciaDietaAnterior);
-        
-        // Mostrar/ocultar campo de tipo de exercício
-        const exercicioSim = document.getElementById('exercicio-sim');
-        const exercicioNao = document.getElementById('exercicio-nao');
-        const tipoExercicioGroup = document.getElementById('tipo-exercicio-group');
-        
-        function toggleTipoExercicio() {
-            tipoExercicioGroup.style.display = exercicioSim.checked ? 'block' : 'none';
-        }
-        
-        exercicioSim.addEventListener('change', toggleTipoExercicio);
-        exercicioNao.addEventListener('change', toggleTipoExercicio);
-        
-        // URL do Google Apps Script
-        const scriptURL = "https://script.google.com/macros/s/AKfycbz_oJBYxVYR4jRAcFKd4cfMf7CZIoX-S1OcR_PMQAaQuReBeMPbLXzJPWP1thLlLoS_/exec";
-        
-        // Validação e envio do formulário
-        document.getElementById('dietForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Mostrar loading e esconder outras mensagens
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('debugInfo').style.display = 'none';
-            
-            // Coletar dados do formulário
-            const formData = new FormData(e.target);
-            const formObject = {};
-            formData.forEach((value, key) => {
-                // Para checkboxes e radios com múltiplos valores
-                if (formObject[key]) {
-                    formObject[key] = Array.isArray(formObject[key]) 
-                        ? [...formObject[key], value] 
-                        : [formObject[key], value];
-                } else {
-                    formObject[key] = value;
-                }
-            });
-            
-            // Adicionar timestamp
-            formObject.timestamp = new Date().toISOString();
-            
-            // Enviar para o Google Apps Script
-            fetch(scriptURL, {
-                method: "POST",
-                body: JSON.stringify(formObject),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(data => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-                e.target.reset();
-                
-                // Rolagem suave para a mensagem de sucesso
-                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-            })
-            .catch(error => {
-                console.error("Erro ao enviar:", error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorDetail').textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
-                
-                // Mostrar informações de debug
-                document.getElementById('debugInfo').style.display = 'block';
-                document.getElementById('debugDetail').textContent = `URL: ${scriptURL}\nErro: ${error.message}\nTipo: ${error.name}`;
-                
-                // Rolagem suave para a mensagem de erro
-                document.getElementById('errorMessage').scrollIntoView({ behavior: 'smooth' });
-            });
+      }
+      // normalize empty strings to undefined (optional)
+      return obj;
+    }
+
+    // Front-end validation helper (basic)
+    function validate(formEl) {
+      // use native validity + required attributes
+      if (!formEl.reportValidity()) return false;
+      // custom: ensure at least one objetivo selected
+      const objetivo = formEl.querySelector('input[name="objetivo"]:checked');
+      if (!objetivo) { toast('Selecione um objetivo.', false); return false; }
+      return true;
+    }
+
+    // Submit handler
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      if (!validate(form)) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      const payload = serializeFormToObject(form);
+      payload.timestamp = new Date().toISOString();
+
+      // Try normal fetch first
+      try {
+        const res = await fetch(APP_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
-        
-        // Botão de tentar novamente
-        document.getElementById('retryButton').addEventListener('click', function() {
-            document.getElementById('errorMessage').style.display = 'none';
-            document.getElementById('debugInfo').style.display = 'none';
-        });
-        
-        // Testar a conexão com o Google Apps Script
-        function testConnection() {
-            fetch(scriptURL, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify(formObject),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(() => {
-                alert("✅ Formulário enviado com sucesso!");
-            })
-            .catch(err => {
-                alert("❌ Erro ao enviar: " + err);
-            });
-        // Testar a conexão quando a página carregar
-        window.addEventListener('load', testConnection);
-    </script>
+
+        // If response is opaque or not ok, try fallback
+        if (!res.ok) {
+          // If status exists but not ok => error
+          let text = await res.text().catch(()=>null);
+          toast('Erro no envio: ' + (text || res.status), false);
+          console.error('Server error response:', res, text);
+        } else {
+          // try parse JSON (Apps Script returns JSON)
+          const json = await res.json().catch(()=>null);
+          if (json && json.status === 'success') {
+            toast('Formulário enviado com sucesso!');
+            form.reset();
+          } else {
+            toast('Enviado — verifique planilha. (resposta inesperada)', true);
+            form.reset();
+          }
+        }
+      } catch (err) {
+        // CORS or network error: tentar fallback com no-cors
+        console.warn('Fetch normal falhou:', err);
+        try {
+          await fetch(APP_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          // Não é possível ler resposta em no-cors; presumimos sucesso se não lançou
+          toast('Enviado (fallback). Se não aparecer na planilha, verifique deploy do Apps Script.', true);
+          form.reset();
+        } catch (err2) {
+          console.error('Fallback também falhou:', err2);
+          toast('Falha ao enviar — veja console e verifique URL/permissões.', false);
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar e gerar plano';
+      }
+    });
+
+    resetBtn.addEventListener('click', ()=> {
+      form.reset();
+      toast('Formulário limpo.', true);
+    });
+
+    // Accessibility: focus first input on load
+    window.addEventListener('load', ()=>{ $('#nome').focus(); });
+
+    // Small: update slider label (if you want to display numeric)
+    const estresse = $('#estresse');
+    if(estresse){
+      estresse.addEventListener('input', ()=> {
+        // optional: show current value somewhere
+      });
+    }
+  </script>
 </body>
 </html>
