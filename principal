@@ -262,7 +262,7 @@
         <div class="header">
             <div class="logo">VittaWay</div>
         </div>
-        <h1>Planejador de Dieta Personalizada</h1>
+        <h1>Planejador de Dieta</h1>
         <p class="description">Responda as perguntas abaixo para receber um plano alimentar adaptado às suas necessidades</p>
         
         <div class="success-message" id="successMessage">
@@ -941,17 +941,19 @@
         // Testar a conexão com o Google Apps Script
         function testConnection() {
             fetch(scriptURL, {
-                method: "HEAD",
-                mode: "no-cors"
+                method: "POST",
+                mode: "no-cors",
+                body: JSON.stringify(formObject),
+                headers: {
+                    "Content-Type": "application/json"
+                }
             })
             .then(() => {
-                console.log("Conexão com o Google Apps Script parece estar funcionando");
+                alert("✅ Formulário enviado com sucesso!");
             })
-            .catch(error => {
-                console.warn("Não foi possível testar a conexão com o Google Apps Script:", error);
+            .catch(err => {
+                alert("❌ Erro ao enviar: " + err);
             });
-        }
-        
         // Testar a conexão quando a página carregar
         window.addEventListener('load', testConnection);
     </script>
